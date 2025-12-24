@@ -1,16 +1,17 @@
 import * as THREE from "three";
 
-const START_POS = new THREE.Vector3(0, 1.6, 6);
-const LOOK_AT = new THREE.Vector3(0, 1.4, 0);
-
 export function interpolateCameraFromPoints(camera, points, progress) {
   if (!camera || !points || points.length < 2) return;
 
-  const p = Math.min(Math.max(progress, 0), 1);
-  const total = points.length - 1;
+  // 🔒 Clamp progress
+  const p = THREE.MathUtils.clamp(progress, 0, 1);
 
-  const scaled = p * total;
-  const index = Math.floor(scaled);
+  const totalSegments = points.length - 1;
+
+  // 🔒 Prevent early skipping of index 0
+  const scaled = p * totalSegments;
+  const index = Math.min(Math.floor(scaled), totalSegments - 1);
+
   const t = scaled - index;
 
   const from = points[index];
@@ -20,6 +21,10 @@ export function interpolateCameraFromPoints(camera, points, progress) {
 
   const look = new THREE.Vector3().lerpVectors(from.lookAt, to.lookAt, t);
 
+  // ✅ Smooth movement
   camera.position.lerp(pos, 0.12);
+
+  // 🔒 CRITICAL: remove roll forever
+  camera.up.set(0, 1, 0);
   camera.lookAt(look);
 }

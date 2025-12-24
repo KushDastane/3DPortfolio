@@ -1,15 +1,5 @@
-# Fix Black Screen During Scrolling
-
-## Tasks
-
-- [x] Add room loading state tracking in ThreeExperience.jsx
-- [x] Modify animation loop to enable camera interpolation only after room is loaded
-- [x] Test scrolling to ensure smooth camera movement without black screens
-
-# Fix Shaky Transition from Last Screen to First Screen
-
-## Tasks
-
-- [x] Adjust progress interpolation speed for large jumps (from outro to first screen)
-- [x] Remove unused currentIndexRef variable
-- [x] Test navigation to ensure smooth transition without shakiness
+- [ ] Import all screen components in PortfolioUI.jsx (Experience, Achievements, Testimonials, Contact)
+- [ ] Modify PortfolioUI.jsx to render all screens with individual opacity transitions based on activeSection
+- [ ] Update useExperience.js exitScreen to reset activeSection to null
+- [ ] Ensure buttons remain functional by verifying z-index and event handling
+- [ ] Test transitions between screens to confirm fade out/in behavior

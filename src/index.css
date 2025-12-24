@@ -3,3 +3,11 @@
 .scroll-container {
   height: 900vh; /* 9 sections later */
 }
+
+.crt-ui {
+  background: #0b0f0e;
+  color: #4cffc0;
+  font-family: monospace;
+  width: 100%;
+  height: 100%;
+}

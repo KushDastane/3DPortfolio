@@ -4,7 +4,9 @@ export function registerScreens(room, screenMap) {
   const screens = [];
 
   room.traverse((child) => {
+    console.log("checking child", child.name, child.isMesh);
     if (child.isMesh && screenMap[child.name]) {
+      console.log("registering screen", child.name);
       // CLONE MATERIAL ONCE
       child.material = child.material.clone();
 
@@ -23,5 +25,6 @@ export function registerScreens(room, screenMap) {
     }
   });
 
+  console.log("total screens registered", screens.length);
   return screens;
 }

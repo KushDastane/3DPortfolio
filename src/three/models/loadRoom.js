@@ -25,9 +25,28 @@ export function loadRoom(scene) {
 
             if (foundMesh) {
               foundMesh.userData.isScreen = true;
+              if (node.name === "Screen_About")
+                foundMesh.userData.section = "about";
+              else if (node.name === "Screen_Skills")
+                foundMesh.userData.section = "skills";
+              else if (node.name === "Screen_Projects")
+                foundMesh.userData.section = "projects";
+              else if (node.name === "Screen_Experience")
+                foundMesh.userData.section = "experience";
+              else if (node.name === "Screen_Achievements")
+                foundMesh.userData.section = "achievements";
+              else if (node.name === "Screen_Testimonials")
+                foundMesh.userData.section = "testimonials";
+              else if (node.name === "Screen_Contact")
+                foundMesh.userData.section = "contact";
               screens.push(foundMesh);
 
-              console.log("✅ SCREEN SURFACE REGISTERED:", foundMesh.name);
+              console.log(
+                "✅ SCREEN SURFACE REGISTERED:",
+                foundMesh.name,
+                "section:",
+                foundMesh.userData.section
+              );
             } else {
               console.warn("⚠️ No mesh found inside", node.name);
             }

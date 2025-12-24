@@ -1,12 +1,27 @@
 import { create } from "zustand";
 
 export const useExperience = create((set) => ({
-  activeSection: null, // "about" | "skills" | ...
-  mode: "room", // "room" | "entering" | "inside"
+  activeSection: null,
+  previousSection: null,
+  transitioning: false,
 
-  enterSection: (section) => set({ activeSection: section, mode: "entering" }),
+  startTransition: (next) =>
+    set((state) => ({
+      previousSection: state.activeSection,
+      activeSection: next,
+      transitioning: true,
+    })),
 
-  setInside: () => set({ mode: "inside" }),
+  endTransition: () =>
+    set({
+      previousSection: null,
+      transitioning: false,
+    }),
 
-  exitSection: () => set({ activeSection: null, mode: "room" }),
+  exitScreen: () =>
+    set((state) => ({
+      previousSection: state.activeSection,
+      activeSection: null,
+      transitioning: true,
+    })),
 }));

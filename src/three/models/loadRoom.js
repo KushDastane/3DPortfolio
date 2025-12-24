@@ -46,7 +46,7 @@ export function loadRoom(scene) {
         });
 
         room.scale.set(1, 1, 1);
-        room.position.set(0, 0, 0);
+        room.position.set(0, -0.8, 0);
         room.rotation.set(0, 0, 0);
 
         scene.add(room);

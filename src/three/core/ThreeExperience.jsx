@@ -112,8 +112,10 @@ export default function ThreeExperience() {
       }
 
       // Smooth index transition
-      progressRef.current +=
-        (targetIndexRef.current - progressRef.current) * 0.08;
+      const diff = targetIndexRef.current - progressRef.current;
+      const speed = Math.abs(diff) > 1 ? 0.3 : 0.08;
+      progressRef.current += diff * speed;
+      if (Math.abs(diff) < 0.01) progressRef.current = targetIndexRef.current;
 
       const i = Math.floor(progressRef.current);
       const t = progressRef.current - i;
@@ -141,20 +143,28 @@ export default function ThreeExperience() {
       {ready && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-4 z-50">
           <button
-            onClick={() =>
-              (targetIndexRef.current = Math.max(0, targetIndexRef.current - 1))
-            }
+            onClick={() => {
+              if (targetIndexRef.current === 1) {
+                targetIndexRef.current = cameraPointsRef.current.length - 1;
+              } else {
+                targetIndexRef.current = Math.max(0, targetIndexRef.current - 1);
+              }
+            }}
           >
             ◀ Prev
           </button>
 
           <button
-            onClick={() =>
-              (targetIndexRef.current = Math.min(
-                cameraPointsRef.current.length - 1,
-                targetIndexRef.current + 1
-              ))
-            }
+            onClick={() => {
+              if (targetIndexRef.current === cameraPointsRef.current.length - 1) {
+                targetIndexRef.current = 1;
+              } else {
+                targetIndexRef.current = Math.min(
+                  cameraPointsRef.current.length - 1,
+                  targetIndexRef.current + 1
+                );
+              }
+            }}
           >
             Next ▶
           </button>

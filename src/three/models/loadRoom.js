@@ -14,7 +14,6 @@ export function loadRoom(scene) {
         room.traverse((node) => {
           console.log("NODE:", node.name);
 
-          // 🔥 If this node is a Screen_* group
           if (node.name.startsWith("Screen_")) {
             let foundMesh = null;
 
@@ -27,12 +26,6 @@ export function loadRoom(scene) {
             if (foundMesh) {
               foundMesh.userData.isScreen = true;
               screens.push(foundMesh);
-
-              // visual debug
-              foundMesh.material = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                emissive: 0x222222,
-              });
 
               console.log("✅ SCREEN SURFACE REGISTERED:", foundMesh.name);
             } else {
@@ -51,8 +44,6 @@ export function loadRoom(scene) {
             }
           }
         });
-
-
 
         room.scale.set(1, 1, 1);
         room.position.set(0, 0, 0);

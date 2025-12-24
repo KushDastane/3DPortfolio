@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.scroll-container {
+  height: 900vh; /* 9 sections later */
+}

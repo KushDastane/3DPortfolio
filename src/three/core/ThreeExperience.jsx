@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { createScene } from "../scene/createScene";
@@ -7,99 +7,122 @@ import { createRenderer } from "../scene/createRenderer";
 import { createLights } from "../scene/createLights";
 import { loadRoom } from "../models/loadRoom";
 
-import { cameraPath } from "../camera/cameraPath";
-import { interpolateCamera } from "../camera/cameraController";
+/* ================= CAMERA PATH ================= */
 
-import { getActiveSection } from "../../hooks/useActiveSection";
-import { registerScreens } from "../screens/registerScreens";
-import { screenMap } from "../screens/screenMap";
-import { setScreenState, activateScreen } from "../screens/screenController";
+function buildCameraPoints(screens) {
+  const sorted = [...screens].sort((a, b) => a.position.x - b.position.x);
+
+  const points = [];
+  const CAMERA_Z = 4.8;
+  const CAMERA_Y = 1.4;
+
+  // 🌍 START – overview
+  points.push({
+    position: new THREE.Vector3(0, 2.2, 8),
+    lookAt: new THREE.Vector3(0, 1.4, 0),
+    label: "overview",
+  });
+
+  // 🖥 Screens – left → right
+  sorted.forEach((screen, i) => {
+    const pos = new THREE.Vector3();
+    screen.getWorldPosition(pos);
+
+    points.push({
+      position: new THREE.Vector3(pos.x, CAMERA_Y, CAMERA_Z),
+      lookAt: pos.clone(),
+      label: `screen-${i}`,
+    });
+  });
+
+  // 🌍 END – outro
+  points.push({
+    position: new THREE.Vector3(0, 2.2, 8),
+    lookAt: new THREE.Vector3(0, 1.4, 0),
+    label: "outro",
+  });
+
+  return points;
+}
+
+function interpolateCamera(camera, from, to, t) {
+  const pos = new THREE.Vector3().lerpVectors(from.position, to.position, t);
+  const look = new THREE.Vector3().lerpVectors(from.lookAt, to.lookAt, t);
+
+  camera.position.lerp(pos, 0.12);
+  camera.lookAt(look);
+}
+
+/* ================= MAIN ================= */
 
 export default function ThreeExperience() {
   const containerRef = useRef(null);
   const cameraRef = useRef(null);
-  const sceneRef = useRef(null);
-  const rendererRef = useRef(null);
 
-  const screensRef = useRef([]);
-  const activeSectionRef = useRef(null);
-
-  // SINGLE progress source
+  const cameraPointsRef = useRef([]);
+  const targetIndexRef = useRef(0);
+  const currentIndexRef = useRef(0);
   const progressRef = useRef(0);
-  const lastTouchY = useRef(null);
 
-  /* ---------------- INPUT ---------------- */
+  const [ready, setReady] = useState(false);
+
+  /* ---------- KEYBOARD CONTROLS ---------- */
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    function onKey(e) {
+      if (!ready) return;
 
-    function onWheel(e) {
-      progressRef.current += e.deltaY * 0.0004;
-      progressRef.current = Math.min(Math.max(progressRef.current, 0), 1);
+      if (e.key === "ArrowRight") {
+        targetIndexRef.current = Math.min(
+          cameraPointsRef.current.length - 1,
+          targetIndexRef.current + 1
+        );
+      }
+
+      if (e.key === "ArrowLeft") {
+        targetIndexRef.current = Math.max(0, targetIndexRef.current - 1);
+      }
     }
 
-    function onTouchStart(e) {
-      lastTouchY.current = e.touches[0].clientY;
-    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [ready]);
 
-    function onTouchMove(e) {
-      if (lastTouchY.current === null) return;
-
-      const currentY = e.touches[0].clientY;
-      const delta = lastTouchY.current - currentY;
-
-      progressRef.current += delta * 0.002;
-      progressRef.current = Math.min(Math.max(progressRef.current, 0), 1);
-
-      lastTouchY.current = currentY;
-    }
-
-    el.addEventListener("wheel", onWheel, { passive: true });
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: true });
-
-    return () => {
-      el.removeEventListener("wheel", onWheel);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-    };
-  }, []);
-
-  /* ---------------- THREE SETUP ---------------- */
+  /* ---------- THREE ---------- */
   useEffect(() => {
     const container = containerRef.current;
 
     const scene = createScene();
-    sceneRef.current = scene;
-
     const camera = createCamera(container.clientWidth, container.clientHeight);
     cameraRef.current = camera;
 
     const renderer = createRenderer(container);
-    rendererRef.current = renderer;
-
     createLights(scene);
 
-    loadRoom(scene).then((room) => {
-      screensRef.current = registerScreens(room, screenMap);
+    loadRoom(scene).then(({ screens }) => {
+      cameraPointsRef.current = buildCameraPoints(screens);
+      setReady(true);
     });
 
     function animate() {
       requestAnimationFrame(animate);
 
-      interpolateCamera(cameraRef.current, cameraPath, progressRef.current);
-
-      const activeSection = getActiveSection(progressRef.current);
-
-      if (activeSectionRef.current !== activeSection) {
-        activeSectionRef.current = activeSection;
-        activateScreen(activeSection, cameraRef.current);
+      if (!ready) {
+        renderer.render(scene, camera);
+        return;
       }
 
-      screensRef.current.forEach((screen) => {
-        setScreenState(screen, screen.userData.section === activeSection);
-      });
+      // Smooth index transition
+      progressRef.current +=
+        (targetIndexRef.current - progressRef.current) * 0.08;
 
+      const i = Math.floor(progressRef.current);
+      const t = progressRef.current - i;
+
+      const points = cameraPointsRef.current;
+      const from = points[i];
+      const to = points[Math.min(i + 1, points.length - 1)];
+
+      interpolateCamera(camera, from, to, t);
       renderer.render(scene, camera);
     }
 
@@ -108,12 +131,35 @@ export default function ThreeExperience() {
     return () => {
       container.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [ready]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-screen overflow-hidden touch-none"
-    />
+    <>
+      <div ref={containerRef} className="w-full h-screen overflow-hidden" />
+
+      {/* UI CONTROLS */}
+      {ready && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-4 z-50">
+          <button
+            onClick={() =>
+              (targetIndexRef.current = Math.max(0, targetIndexRef.current - 1))
+            }
+          >
+            ◀ Prev
+          </button>
+
+          <button
+            onClick={() =>
+              (targetIndexRef.current = Math.min(
+                cameraPointsRef.current.length - 1,
+                targetIndexRef.current + 1
+              ))
+            }
+          >
+            Next ▶
+          </button>
+        </div>
+      )}
+    </>
   );
 }

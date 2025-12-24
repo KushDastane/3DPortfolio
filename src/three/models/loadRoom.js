@@ -9,29 +9,57 @@ export function loadRoom(scene) {
       "/models/room/room2.glb",
       (gltf) => {
         const room = gltf.scene;
+        const screens = [];
 
-        room.traverse((child) => {
-            console.log(child.name);
+        room.traverse((node) => {
+          console.log("NODE:", node.name);
 
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
+          // 🔥 If this node is a Screen_* group
+          if (node.name.startsWith("Screen_")) {
+            let foundMesh = null;
 
-            // Ensure correct color handling
-            if (child.material) {
-              child.material.side = THREE.FrontSide;
-              child.material.needsUpdate = true;
+            node.traverse((child) => {
+              if (!foundMesh && child.isMesh && child.geometry) {
+                foundMesh = child;
+              }
+            });
+
+            if (foundMesh) {
+              foundMesh.userData.isScreen = true;
+              screens.push(foundMesh);
+
+              // visual debug
+              foundMesh.material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                emissive: 0x222222,
+              });
+
+              console.log("✅ SCREEN SURFACE REGISTERED:", foundMesh.name);
+            } else {
+              console.warn("⚠️ No mesh found inside", node.name);
+            }
+          }
+
+          // regular mesh setup (for all meshes)
+          if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+
+            if (node.material) {
+              node.material.side = THREE.FrontSide;
+              node.material.needsUpdate = true;
             }
           }
         });
 
-        // These WILL be tuned by you
+
+
         room.scale.set(1, 1, 1);
         room.position.set(0, 0, 0);
         room.rotation.set(0, 0, 0);
 
         scene.add(room);
-        resolve(room);
+        resolve({ room, screens });
       },
       undefined,
       (error) => {

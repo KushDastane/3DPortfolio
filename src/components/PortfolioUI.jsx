@@ -40,7 +40,9 @@ export default function PortfolioUI() {
             */}
             <div
               className={`${
-                isActive ? "pointer-events-auto" : "pointer-events-none"
+                isActive
+                  ? "pointer-events-auto active-screen"
+                  : "pointer-events-none"
               }`}
             >
               <Screen />

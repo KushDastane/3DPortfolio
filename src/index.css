@@ -173,8 +173,12 @@ body.three-active .three-nav * {
 }
 
 /* ✅ Allow portfolio UI content */
-body.three-active .portfolio-ui,
-body.three-active .portfolio-ui * {
+body.three-active .portfolio-ui {
+  pointer-events: auto;
+}
+
+body.three-active .active-screen,
+body.three-active .active-screen * {
   pointer-events: auto;
 }
 

@@ -1,12 +1,23 @@
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
 import CRTScreen from "../CRTScreen";
+import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope } from "react-icons/fa";
 
 export default function ContactScreen() {
   const [status, setStatus] = useState("IDLE");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleInputChange(field, value) {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleSubmit() {
+    if (!formData.name || !formData.email || !formData.message) return;
+
     setStatus("SENDING");
 
     emailjs
@@ -14,96 +25,189 @@ export default function ContactScreen() {
         "service_b975r8v",
         "template_ykzmy4c",
         {
-          from_name: e.target.name.value,
-          from_email: e.target.email.value,
-          message: e.target.message.value,
+          from_name: formData.name,
+          from_email: formData.email,
+          message: formData.message,
         },
         "xFLspg7cIcxfDEKsJ"
       )
       .then(
         () => {
           setStatus("SENT");
-          e.target.reset();
+          setTimeout(() => {
+            setFormData({ name: "", email: "", message: "" });
+            setStatus("IDLE");
+          }, 3500);
         },
         () => {
           setStatus("ERROR");
+          setTimeout(() => setStatus("IDLE"), 3500);
         }
       );
   }
 
   return (
     <CRTScreen>
-      <div className="crt-frame p-6 sm:p-7 flex flex-col h-full">
-        {/* TOP BAR */}
-        <div className="flex justify-between text-xs sm:text-sm pb-3 mb-5 border-b-2 border-black/70">
-          <span>SYSTEM_ROOT // CONTACT_INTERFACE</span>
-          <span>NETWORK: ONLINE</span>
-        </div>
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="crt-frame w-full max-w-md p-5 flex flex-col">
+          {/* ───────── TOP BAR ───────── */}
+          <div className="flex justify-between text-[11px] pb-2 mb-4 border-b-2 border-black/70 tracking-wider">
+            <span>SYSTEM_ROOT // CONTACT</span>
+            <span>NET: ONLINE</span>
+          </div>
 
-        {/* TITLE */}
-        <h1 className="text-xl sm:text-2xl font-bold tracking-widest mb-1">
-          CONTACT.sys
-        </h1>
-        <p className="text-xs opacity-70 mb-6">MODE: MESSAGE_TRANSMISSION</p>
+          {/* ───────── TITLE ───────── */}
+          <h1 className="text-base font-bold tracking-[0.25em] text-center mb-1">
+            CONTACT.sys
+          </h1>
+          <p className="text-[10px] text-center opacity-70 mb-4">
+            MESSAGE_TRANSMISSION_INTERFACE
+          </p>
 
-        {/* FORM */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
-          <Field label="NAME" name="name" />
-          <Field label="EMAIL" name="email" type="email" />
-          <Field label="MESSAGE" name="message" textarea />
+          {/* ───────── STATUS BLOCK ───────── */}
+          {status !== "IDLE" && <StatusBlock status={status} />}
 
-          <button
-            type="submit"
-            className="border-2 border-black/70 px-4 py-2 text-xs sm:text-sm
-                       hover:bg-black/10 transition self-start"
-          >
-            SEND_MESSAGE
-          </button>
-        </form>
+          {/* ───────── FORM ───────── */}
+          <div className="space-y-3 mb-4">
+            <Field
+              label="NAME"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+            />
+            <Field
+              label="EMAIL"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+            />
+            <Field
+              label="MESSAGE"
+              textarea
+              value={formData.message}
+              onChange={(e) => handleInputChange("message", e.target.value)}
+            />
 
-        {/* STATUS */}
-        <div className="mt-4 text-xs font-mono opacity-80">
-          STATUS :: {status === "IDLE" && "AWAITING_INPUT"}
-          {status === "SENDING" && "TRANSMITTING..."}
-          {status === "SENT" && "MESSAGE_SENT ✔"}
-          {status === "ERROR" && "TRANSMISSION_FAILED ✖"}
-        </div>
+            <button
+              onClick={handleSubmit}
+              disabled={status === "SENDING"}
+              className="w-full border-2 border-black/70 py-2 text-[11px]
+                         font-bold tracking-wider hover:bg-black/10
+                         transition disabled:opacity-50"
+            >
+              {status === "SENDING" ? "TRANSMITTING..." : "SEND MESSAGE"}
+            </button>
+          </div>
 
-        {/* FOOTER */}
-        <div className="mt-auto pt-4 text-xs flex justify-between border-t-2 border-black/70">
-          <span>
-            C:\CONTACT&gt; READY<span className="blink">_</span>
-          </span>
-          <span>[ESC] EXIT</span>
+          {/* ───────── SOCIALS ───────── */}
+          <div className="border-t-2 border-black/70 pt-3">
+            <div className="text-[10px] font-bold tracking-widest mb-2">
+              CONNECT_CHANNELS
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <SocialLink
+                icon={<FaGithub />}
+                label="GITHUB"
+                href="https://github.com/yourusername"
+              />
+              <SocialLink
+                icon={<FaLinkedin />}
+                label="LINKEDIN"
+                href="https://linkedin.com/in/yourusername"
+              />
+              <SocialLink
+                icon={<FaTwitter />}
+                label="TWITTER"
+                href="https://twitter.com/yourusername"
+              />
+              <SocialLink
+                icon={<FaEnvelope />}
+                label="EMAIL"
+                href="mailto:you@example.com"
+              />
+            </div>
+          </div>
+
+          {/* ───────── FOOTER ───────── */}
+          <div className="mt-4 pt-2 text-[10px] flex justify-between border-t-2 border-black/70">
+            <span>
+              C:\CONTACT&gt;<span className="blink">_</span>
+            </span>
+            <span>[ESC]</span>
+          </div>
         </div>
       </div>
     </CRTScreen>
   );
 }
 
-/* ================= INPUT FIELD ================= */
+/* ───────────────── COMPONENTS ───────────────── */
 
-function Field({ label, name, type = "text", textarea }) {
+function Field({ label, type = "text", textarea, value, onChange }) {
   return (
-    <label className="flex flex-col text-xs gap-1">
-      <span>{label}</span>
+    <label className="flex flex-col gap-1 text-[10px]">
+      <span className="font-bold tracking-wider">{label}</span>
       {textarea ? (
         <textarea
-          name={name}
-          required
-          rows={4}
+          rows={3}
+          value={value}
+          onChange={onChange}
           className="border-2 border-black/70 bg-transparent px-2 py-1
-                     focus:outline-none resize-none"
+                     text-xs resize-none focus:outline-none"
         />
       ) : (
         <input
           type={type}
-          name={name}
-          required
+          value={value}
+          onChange={onChange}
           className="border-2 border-black/70 bg-transparent px-2 py-1
-                     focus:outline-none"
+                     text-xs focus:outline-none"
         />
       )}
     </label>
+  );
+}
+
+function SocialLink({ icon, label, href }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="border border-black/60 px-2 py-2 flex items-center gap-2
+                 text-[10px] hover:bg-black/10 transition"
+    >
+      <span className="text-sm opacity-80">{icon}</span>
+      <span className="tracking-wider">{label}</span>
+    </a>
+  );
+}
+
+function StatusBlock({ status }) {
+  const map = {
+    SENDING: {
+      title: "TRANSMITTING",
+      color: "bg-yellow-50 border-yellow-700",
+      text: "SENDING DATA PACKET...",
+    },
+    SENT: {
+      title: "SUCCESS",
+      color: "bg-green-50 border-green-700",
+      text: "MESSAGE DELIVERED ✔",
+    },
+    ERROR: {
+      title: "FAILED",
+      color: "bg-red-50 border-red-700",
+      text: "TRANSMISSION ERROR ✖",
+    },
+  };
+
+  const s = map[status];
+
+  return (
+    <div className={`mb-3 border-2 ${s.color} p-2 text-[10px]`}>
+      <div className="font-bold mb-1">{s.title}</div>
+      <div>{s.text}</div>
+    </div>
   );
 }

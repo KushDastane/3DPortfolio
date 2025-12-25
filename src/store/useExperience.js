@@ -7,6 +7,7 @@ export const useExperience = create((set) => ({
   navReady: false,
   goNext: null,
   goPrev: null,
+  canGoPrev: false,
 
   showSection: (section) =>
     set((state) => ({
@@ -18,4 +19,5 @@ export const useExperience = create((set) => ({
   endResync: () => set({ isResyncing: false }),
   setNavReady: (ready, nextFn, prevFn) =>
     set({ navReady: ready, goNext: nextFn, goPrev: prevFn }),
+  setCanGoPrev: (can) => set({ canGoPrev: can }),
 }));

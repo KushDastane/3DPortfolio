@@ -67,6 +67,7 @@ export default function ThreeExperience() {
   const showSection = useExperience((s) => s.showSection);
   const hideSection = useExperience((s) => s.hideSection);
   const setNavReady = useExperience((s) => s.setNavReady);
+  const setCanGoPrev = useExperience((s) => s.setCanGoPrev);
 
   /* ================= GLOBAL LOCK ================= */
 
@@ -85,6 +86,7 @@ export default function ThreeExperience() {
   function goTo(index) {
     hideSection();
     targetIndexRef.current = index;
+    setCanGoPrev(index > 0);
   }
 
   function goNext() {

@@ -8,6 +8,7 @@ export const useExperience = create((set) => ({
   goNext: null,
   goPrev: null,
   canGoPrev: false,
+  isTransitioning: false,
 
   showSection: (section) =>
     set((state) => ({
@@ -20,4 +21,6 @@ export const useExperience = create((set) => ({
   setNavReady: (ready, nextFn, prevFn) =>
     set({ navReady: ready, goNext: nextFn, goPrev: prevFn }),
   setCanGoPrev: (can) => set({ canGoPrev: can }),
+  setIsTransitioning: (transitioning) =>
+    set({ isTransitioning: transitioning }),
 }));

@@ -68,6 +68,9 @@ export default function ThreeExperience() {
   const hideSection = useExperience((s) => s.hideSection);
   const setNavReady = useExperience((s) => s.setNavReady);
   const setCanGoPrev = useExperience((s) => s.setCanGoPrev);
+  const setIsTransitioning = useExperience((s) => s.setIsTransitioning);
+  const isTransitioning = useExperience((s) => s.isTransitioning);
+  const canGoPrev = useExperience((s) => s.canGoPrev);
 
   /* ================= GLOBAL LOCK ================= */
 
@@ -84,16 +87,20 @@ export default function ThreeExperience() {
   /* ================= NAV ================= */
 
   function goTo(index) {
+    if (isTransitioning) return; // Prevent multiple transitions
     hideSection();
     targetIndexRef.current = index;
     setCanGoPrev(index > 0);
+    setIsTransitioning(true);
   }
 
   function goNext() {
+    if (isTransitioning) return;
     goTo((targetIndexRef.current + 1) % cameraPointsRef.current.length);
   }
 
   function goPrev() {
+    if (isTransitioning) return;
     goTo(
       (targetIndexRef.current - 1 + cameraPointsRef.current.length) %
         cameraPointsRef.current.length
@@ -106,13 +113,14 @@ export default function ThreeExperience() {
     if (!ready) return;
 
     function onKey(e) {
+      if (isTransitioning) return; // Block keyboard input during transitions
       if (e.key === "ArrowRight") goNext();
-      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowLeft" && canGoPrev) goPrev();
     }
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [ready]);
+  }, [ready, isTransitioning, canGoPrev]);
 
   /* ================= THREE ================= */
 
@@ -163,6 +171,7 @@ export default function ThreeExperience() {
           if (screen) {
             showSection(screen.userData.section);
           }
+          setIsTransitioning(false); // Transition complete
         }
       }
 

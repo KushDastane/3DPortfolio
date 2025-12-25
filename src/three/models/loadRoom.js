@@ -54,8 +54,22 @@ export function loadRoom(scene) {
           if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
-            if (node.material) node.material.side = THREE.FrontSide;
+
+            if (node.material) {
+              // Prevent purple / horror tint
+              node.material.side = THREE.FrontSide;
+
+              // Normalize color response
+              if (node.material.color) {
+                node.material.color.convertSRGBToLinear();
+              }
+
+              // Make materials calm & matte (not shiny/scary)
+              node.material.roughness = 0.9;
+              node.material.metalness = 0.05;
+            }
           }
+
         });
 
         room.position.set(0, -0.8, 0);

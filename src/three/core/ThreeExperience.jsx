@@ -75,19 +75,14 @@ export default function ThreeExperience() {
   /* ================= GLOBAL LOCK ================= */
 
   useEffect(() => {
-    if (ready) {
-      document.body.classList.add("three-active");
-    }
-
-    return () => {
-      document.body.classList.remove("three-active");
-    };
+    if (ready) document.body.classList.add("three-active");
+    return () => document.body.classList.remove("three-active");
   }, [ready]);
 
   /* ================= NAV ================= */
 
   function goTo(index) {
-    if (isTransitioning) return; // Prevent multiple transitions
+    if (isTransitioning) return;
     hideSection();
     targetIndexRef.current = index;
     setCanGoPrev(index > 0);
@@ -95,16 +90,16 @@ export default function ThreeExperience() {
   }
 
   function goNext() {
-    if (isTransitioning) return;
-    goTo((targetIndexRef.current + 1) % cameraPointsRef.current.length);
+    if (!isTransitioning)
+      goTo((targetIndexRef.current + 1) % cameraPointsRef.current.length);
   }
 
   function goPrev() {
-    if (isTransitioning) return;
-    goTo(
-      (targetIndexRef.current - 1 + cameraPointsRef.current.length) %
-        cameraPointsRef.current.length
-    );
+    if (!isTransitioning)
+      goTo(
+        (targetIndexRef.current - 1 + cameraPointsRef.current.length) %
+          cameraPointsRef.current.length
+      );
   }
 
   /* ================= KEYBOARD ================= */
@@ -113,7 +108,7 @@ export default function ThreeExperience() {
     if (!ready) return;
 
     function onKey(e) {
-      if (isTransitioning) return; // Block keyboard input during transitions
+      if (isTransitioning) return;
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft" && canGoPrev) goPrev();
     }
@@ -167,11 +162,9 @@ export default function ThreeExperience() {
           currentIndexRef.current = targetIndexRef.current;
 
           const screen = screensRef.current[currentIndexRef.current - 1];
+          if (screen) showSection(screen.userData.section);
 
-          if (screen) {
-            showSection(screen.userData.section);
-          }
-          setIsTransitioning(false); // Transition complete
+          setIsTransitioning(false);
         }
       }
 
@@ -187,8 +180,23 @@ export default function ThreeExperience() {
 
   return (
     <>
+      {/* BLURRED BACKGROUND IMAGE */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: "url('/bg1.jpg')",
+
+          // "url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(40px) brightness(1.05) contrast(0.9)",
+          transform: "scale(1.1)",
+          opacity: 0.35, // 🔥 MUCH MORE VISIBLE
+        }}
+      />
+
       {/* THREE */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-10">
         <div ref={containerRef} className="w-full h-screen" />
       </div>
     </>

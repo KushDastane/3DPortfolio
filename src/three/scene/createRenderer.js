@@ -1,28 +1,25 @@
 import * as THREE from "three";
 
 export function createRenderer(container) {
-  console.log("Creating renderer for container:", container);
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     powerPreference: "high-performance",
+    alpha: true, // 🔥 ALLOW TRANSPARENCY
   });
 
   renderer.setSize(container.clientWidth, container.clientHeight);
-  console.log(
-    "Renderer size set to:",
-    container.clientWidth,
-    container.clientHeight
-  );
-
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  console.log("Appending renderer domElement to container");
+  // Clean, bright filmic look
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.4;
+
+  renderer.setClearColor(0x000000, 0); // 🔥 TRANSPARENT CLEAR
+
   container.appendChild(renderer.domElement);
-  renderer.domElement.style.zIndex = "-1";
-  console.log(
-    "Renderer domElement appended, children count:",
-    container.children.length
-  );
+  renderer.domElement.style.zIndex = "1";
+
   return renderer;
 }

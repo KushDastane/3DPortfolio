@@ -156,20 +156,26 @@
     0 25px 90px rgba(0,0,0,0.75);
 }
 
-/* Disable all interactions when 3D experience is active */
+/* Lock background interaction */
+body.three-active {
+  touch-action: manipulation;
+}
+
+/* Disable interaction everywhere by default */
 body.three-active * {
   pointer-events: none;
 }
 
-/* Allow ONLY 3D navigation UI */
+/* ✅ Allow nav buttons */
 body.three-active .three-nav,
 body.three-active .three-nav * {
   pointer-events: auto;
 }
 
-/* Optional: improve mobile tap behavior */
-body.three-active {
-  touch-action: manipulation;
+/* ✅ Allow portfolio UI content */
+body.three-active .portfolio-ui,
+body.three-active .portfolio-ui * {
+  pointer-events: auto;
 }
 
 

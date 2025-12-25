@@ -181,7 +181,7 @@ export default function ThreeExperience() {
 
       {/* NAV (ONLY INTERACTIVE AREA) */}
       {ready && (
-        <div className="three-nav fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex gap-6">
+        <div className="three-nav fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex gap-6">
           <button
             onClick={goPrev}
             className="px-4 py-2 bg-black/80 text-white rounded"

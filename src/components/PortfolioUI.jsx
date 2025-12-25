@@ -22,11 +22,7 @@ export default function PortfolioUI() {
 
   return (
     // UI layer sits above 3D, below nav buttons
-    <div
-      className={`fixed inset-0 z-40 ${
-        activeSection ? "" : "pointer-events-none"
-      }`}
-    >
+    <div className="fixed inset-0 z-40 pointer-events-none">
       {Object.entries(screens).map(([key, Screen]) => {
         const isActive = currentSection === key;
 

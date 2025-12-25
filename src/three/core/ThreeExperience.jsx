@@ -16,7 +16,6 @@ const desiredOrder = [
   "skills",
   "projects",
   "experience",
-  "achievements",
   "testimonials",
   "contact",
 ];
@@ -29,27 +28,39 @@ function buildCameraPoints(screens) {
   });
 
   const points = [];
-  const DISTANCE = 1.6;
+  const DISTANCE = 3;
 
+  // OVERVIEW CAMERA
   points.push({
     position: new THREE.Vector3(0, 2.2, 8),
     lookAt: new THREE.Vector3(0, 1.4, 0),
   });
 
+  // SCREEN CAMERAS
   sorted.forEach((screen) => {
+    // Screen world position
     const pos = new THREE.Vector3();
     screen.getWorldPosition(pos);
 
+    // Screen world rotation
+    const quat = new THREE.Quaternion();
+    screen.getWorldQuaternion(quat);
+
+    // Screen forward direction (normal)
     const forward = new THREE.Vector3(0, 0, 1)
-      .applyQuaternion(screen.getWorldQuaternion(new THREE.Quaternion()))
+      .applyQuaternion(quat)
       .normalize();
 
+    // Camera position directly in front of screen
+    const camPos = pos.clone().add(forward.clone().multiplyScalar(DISTANCE));
+
     points.push({
-      position: pos.clone().add(forward.multiplyScalar(DISTANCE)),
+      position: camPos,
       lookAt: pos.clone(),
     });
   });
 
+  // EXIT CAMERA
   points.push({
     position: new THREE.Vector3(0, 2.2, 8),
     lookAt: new THREE.Vector3(0, 1.4, 0),
@@ -67,7 +78,13 @@ function interpolateCamera(camera, from, to, t) {
 }
 
 function hasArrived(camera, targetPoint) {
-  return targetPoint && camera.position.distanceTo(targetPoint.position) < 0.05;
+  return (
+    targetPoint && camera.position.distanceTo(targetPoint.position) < 0.001
+  );
+}
+
+function isAlmostArrived(camera, targetPoint) {
+  return targetPoint && camera.position.distanceTo(targetPoint.position) < 1.0;
 }
 
 /* ================= SCREEN POWER ================= */
@@ -100,9 +117,12 @@ export default function ThreeExperience() {
   const targetIndexRef = useRef(0);
   const progressRef = useRef(0);
   const arrivedIndexRef = useRef(0);
+  const resyncTriggeredRef = useRef(false);
 
   const showSection = useExperience((s) => s.showSection);
   const hideSection = useExperience((s) => s.hideSection);
+  const startResync = useExperience((s) => s.startResync);
+  const endResync = useExperience((s) => s.endResync);
 
   const [ready, setReady] = useState(false);
 
@@ -115,6 +135,7 @@ export default function ThreeExperience() {
       activeScreenRef.current = null;
     }
 
+    resyncTriggeredRef.current = false;
     targetIndexRef.current = index;
   }
 
@@ -151,7 +172,11 @@ export default function ThreeExperience() {
     createLights(scene);
 
     loadRoom(scene).then(({ screens }) => {
-      const sortedScreens = [...screens].sort((a, b) => {
+      const filteredScreens = screens.filter((screen) =>
+        desiredOrder.includes(screen.userData.section)
+      );
+
+      const sortedScreens = [...filteredScreens].sort((a, b) => {
         const indexA = desiredOrder.indexOf(a.userData.section);
         const indexB = desiredOrder.indexOf(b.userData.section);
         return indexA - indexB;
@@ -195,21 +220,33 @@ export default function ThreeExperience() {
         t
       );
 
-      if (
-        arrivedIndexRef.current !== targetIndexRef.current &&
-        hasArrived(camera, points[targetIndexRef.current])
-      ) {
-        arrivedIndexRef.current = targetIndexRef.current;
+      if (arrivedIndexRef.current !== targetIndexRef.current) {
+        const targetPoint = points[targetIndexRef.current];
 
-        const screenMesh = screensRef.current[targetIndexRef.current - 1];
-
-        if (screenMesh) {
-          powerOn(screenMesh);
-          activeScreenRef.current = screenMesh;
+        if (
+          Math.abs(targetIndexRef.current - progressRef.current) < 0.5 &&
+          !resyncTriggeredRef.current &&
+          arrivedIndexRef.current !== 0
+        ) {
+          console.log("Starting resync");
+          startResync();
+          resyncTriggeredRef.current = true;
         }
 
-        const section = indexToSectionRef.current[targetIndexRef.current];
-        if (section) showSection(section);
+        if (hasArrived(camera, targetPoint)) {
+          arrivedIndexRef.current = targetIndexRef.current;
+
+          const screenMesh = screensRef.current[targetIndexRef.current - 1];
+
+          if (screenMesh) {
+            powerOn(screenMesh);
+            activeScreenRef.current = screenMesh;
+          }
+
+          endResync();
+          const section = indexToSectionRef.current[targetIndexRef.current];
+          if (section) showSection(section);
+        }
       }
 
       renderer.render(scene, camera);

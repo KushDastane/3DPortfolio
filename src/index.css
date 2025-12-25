@@ -211,6 +211,34 @@
 }
 
 /* ======================================================
+   CRT RESYNC EFFECT
+====================================================== */
+
+.crt-resync .crt-glass {
+  filter: brightness(0.3) hue-rotate(180deg);
+  animation: crt-jitter 0.5s ease-in-out;
+  border: 5px solid red;
+  background: red;
+}
+
+.crt-resync .crt-glass::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.15),
+    rgba(0,0,0,0.15) 3px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+@keyframes crt-jitter {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(2px); }
+  50% { transform: translateY(-1px); }
+  75% { transform: translateY(1px); }
+}
+
+/* ======================================================
    MOBILE FIXES (CRITICAL)
 ====================================================== */
 

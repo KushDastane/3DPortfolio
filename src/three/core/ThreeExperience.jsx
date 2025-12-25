@@ -144,16 +144,19 @@ export default function ThreeExperience() {
       if (!ready) return;
 
       if (e.key === "ArrowRight") {
-        moveTo(
-          Math.min(
-            cameraPointsRef.current.length - 1,
-            targetIndexRef.current + 1
-          )
-        );
+        const nextIndex =
+          targetIndexRef.current === cameraPointsRef.current.length - 1
+            ? 1
+            : targetIndexRef.current + 1;
+        moveTo(nextIndex);
       }
 
       if (e.key === "ArrowLeft") {
-        moveTo(Math.max(0, targetIndexRef.current - 1));
+        const prevIndex =
+          targetIndexRef.current === 1
+            ? cameraPointsRef.current.length - 1
+            : Math.max(0, targetIndexRef.current - 1);
+        moveTo(prevIndex);
       }
     }
 
@@ -267,21 +270,26 @@ export default function ThreeExperience() {
       {ready && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-6 z-[100]">
           <button
-            onClick={() => moveTo(Math.max(0, targetIndexRef.current - 1))}
+            onClick={() => {
+              const prevIndex =
+                targetIndexRef.current === 1
+                  ? cameraPointsRef.current.length - 1
+                  : Math.max(0, targetIndexRef.current - 1);
+              moveTo(prevIndex);
+            }}
             className="px-4 py-2 bg-black/70 text-white rounded"
           >
             ◀ Prev
           </button>
 
           <button
-            onClick={() =>
-              moveTo(
-                Math.min(
-                  cameraPointsRef.current.length - 1,
-                  targetIndexRef.current + 1
-                )
-              )
-            }
+            onClick={() => {
+              const nextIndex =
+                targetIndexRef.current === cameraPointsRef.current.length - 1
+                  ? 1
+                  : targetIndexRef.current + 1;
+              moveTo(nextIndex);
+            }}
             className="px-4 py-2 bg-black/70 text-white rounded"
           >
             Next ▶

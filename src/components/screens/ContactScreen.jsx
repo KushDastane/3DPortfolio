@@ -12,7 +12,7 @@ export default function ContactScreen() {
     emailjs
       .send(
         "service_b975r8v",
-        "template_0833flw",
+        "template_ykzmy4c",
         {
           from_name: e.target.name.value,
           from_email: e.target.email.value,

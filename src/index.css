@@ -156,6 +156,22 @@
     0 25px 90px rgba(0,0,0,0.75);
 }
 
+/* Disable all interactions when 3D experience is active */
+body.three-active * {
+  pointer-events: none;
+}
+
+/* Allow ONLY 3D navigation UI */
+body.three-active .three-nav,
+body.three-active .three-nav * {
+  pointer-events: auto;
+}
+
+/* Optional: improve mobile tap behavior */
+body.three-active {
+  touch-action: manipulation;
+}
+
 
 /* ======================================================
    HEADER / FOOTER

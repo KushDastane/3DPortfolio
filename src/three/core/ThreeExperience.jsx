@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { useExperience } from "../../store/useExperience";
-
 import { createScene } from "../scene/createScene";
 import { createCamera } from "../scene/createCamera";
 import { createRenderer } from "../scene/createRenderer";
 import { createLights } from "../scene/createLights";
 import { loadRoom } from "../models/loadRoom";
 
-/* ================= CAMERA PATH ================= */
+/* ================= CONFIG ================= */
 
 const desiredOrder = [
   "about",
@@ -20,87 +19,36 @@ const desiredOrder = [
   "contact",
 ];
 
+/* ================= CAMERA PATH ================= */
+
 function buildCameraPoints(screens) {
-  const sorted = [...screens].sort((a, b) => {
-    const indexA = desiredOrder.indexOf(a.userData.section);
-    const indexB = desiredOrder.indexOf(b.userData.section);
-    return indexA - indexB;
-  });
-
+  const DIST = 3;
   const points = [];
-  const DISTANCE = 3;
 
-  // OVERVIEW CAMERA
+  // Overview
   points.push({
     position: new THREE.Vector3(0, 2.2, 8),
     lookAt: new THREE.Vector3(0, 1.4, 0),
   });
 
-  // SCREEN CAMERAS
-  sorted.forEach((screen) => {
-    // Screen world position
+  screens.forEach((screen) => {
     const pos = new THREE.Vector3();
-    screen.getWorldPosition(pos);
-
-    // Screen world rotation
     const quat = new THREE.Quaternion();
+
+    screen.getWorldPosition(pos);
     screen.getWorldQuaternion(quat);
 
-    // Screen forward direction (normal)
     const forward = new THREE.Vector3(0, 0, 1)
       .applyQuaternion(quat)
       .normalize();
 
-    // Camera position directly in front of screen
-    const camPos = pos.clone().add(forward.clone().multiplyScalar(DISTANCE));
-
     points.push({
-      position: camPos,
+      position: pos.clone().add(forward.multiplyScalar(DIST)),
       lookAt: pos.clone(),
     });
   });
 
-  // EXIT CAMERA
-  points.push({
-    position: new THREE.Vector3(0, 2.2, 8),
-    lookAt: new THREE.Vector3(0, 1.4, 0),
-  });
-
   return points;
-}
-
-function interpolateCamera(camera, from, to, t) {
-  camera.position.lerp(
-    new THREE.Vector3().lerpVectors(from.position, to.position, t),
-    0.12
-  );
-  camera.lookAt(new THREE.Vector3().lerpVectors(from.lookAt, to.lookAt, t));
-}
-
-function hasArrived(camera, targetPoint) {
-  return (
-    targetPoint && camera.position.distanceTo(targetPoint.position) < 0.001
-  );
-}
-
-function isAlmostArrived(camera, targetPoint) {
-  return targetPoint && camera.position.distanceTo(targetPoint.position) < 1.0;
-}
-
-/* ================= SCREEN POWER ================= */
-
-function powerOn(screen) {
-  if (!screen) return;
-  screen.material.emissive.setHex(0x00ff88);
-  screen.material.emissiveIntensity = 0.9;
-  screen.userData.isPoweredOn = true;
-}
-
-function powerOff(screen) {
-  if (!screen) return;
-  screen.material.emissive.setHex(0x000000);
-  screen.material.emissiveIntensity = 0;
-  screen.userData.isPoweredOn = false;
 }
 
 /* ================= MAIN ================= */
@@ -108,63 +56,63 @@ function powerOff(screen) {
 export default function ThreeExperience() {
   const containerRef = useRef(null);
 
-  const screensRef = useRef([]);
-  const activeScreenRef = useRef(null);
-
   const cameraPointsRef = useRef([]);
-  const indexToSectionRef = useRef({});
+  const screensRef = useRef([]);
 
+  const currentIndexRef = useRef(0);
   const targetIndexRef = useRef(0);
-  const progressRef = useRef(0);
-  const arrivedIndexRef = useRef(0);
-  const resyncTriggeredRef = useRef(false);
-
-  const showSection = useExperience((s) => s.showSection);
-  const hideSection = useExperience((s) => s.hideSection);
-  const startResync = useExperience((s) => s.startResync);
-  const endResync = useExperience((s) => s.endResync);
 
   const [ready, setReady] = useState(false);
 
-  /* ---------- INPUT ---------- */
-  function moveTo(index) {
-    hideSection();
+  const showSection = useExperience((s) => s.showSection);
+  const hideSection = useExperience((s) => s.hideSection);
 
-    if (activeScreenRef.current) {
-      powerOff(activeScreenRef.current);
-      activeScreenRef.current = null;
+  /* ================= GLOBAL LOCK ================= */
+
+  useEffect(() => {
+    if (ready) {
+      document.body.classList.add("three-active");
     }
 
-    resyncTriggeredRef.current = false;
+    return () => {
+      document.body.classList.remove("three-active");
+    };
+  }, [ready]);
+
+  /* ================= NAV ================= */
+
+  function goTo(index) {
+    hideSection();
     targetIndexRef.current = index;
   }
 
+  function goNext() {
+    goTo((targetIndexRef.current + 1) % cameraPointsRef.current.length);
+  }
+
+  function goPrev() {
+    goTo(
+      (targetIndexRef.current - 1 + cameraPointsRef.current.length) %
+        cameraPointsRef.current.length
+    );
+  }
+
+  /* ================= KEYBOARD ================= */
+
   useEffect(() => {
+    if (!ready) return;
+
     function onKey(e) {
-      if (!ready) return;
-
-      if (e.key === "ArrowRight") {
-        const nextIndex =
-          targetIndexRef.current === cameraPointsRef.current.length - 1
-            ? 1
-            : targetIndexRef.current + 1;
-        moveTo(nextIndex);
-      }
-
-      if (e.key === "ArrowLeft") {
-        const prevIndex =
-          targetIndexRef.current === 1
-            ? cameraPointsRef.current.length - 1
-            : Math.max(0, targetIndexRef.current - 1);
-        moveTo(prevIndex);
-      }
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
     }
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [ready]);
 
-  /* ---------- THREE ---------- */
+  /* ================= THREE ================= */
+
   useEffect(() => {
     const container = containerRef.current;
 
@@ -175,25 +123,16 @@ export default function ThreeExperience() {
     createLights(scene);
 
     loadRoom(scene).then(({ screens }) => {
-      const filteredScreens = screens.filter((screen) =>
-        desiredOrder.includes(screen.userData.section)
-      );
+      const usable = screens
+        .filter((s) => desiredOrder.includes(s.userData.section))
+        .sort(
+          (a, b) =>
+            desiredOrder.indexOf(a.userData.section) -
+            desiredOrder.indexOf(b.userData.section)
+        );
 
-      const sortedScreens = [...filteredScreens].sort((a, b) => {
-        const indexA = desiredOrder.indexOf(a.userData.section);
-        const indexB = desiredOrder.indexOf(b.userData.section);
-        return indexA - indexB;
-      });
-
-      screensRef.current = sortedScreens;
-      cameraPointsRef.current = buildCameraPoints(sortedScreens);
-
-      const map = {};
-      sortedScreens.forEach((screen, i) => {
-        map[i + 1] = screen.userData.section;
-      });
-
-      indexToSectionRef.current = map;
+      screensRef.current = usable;
+      cameraPointsRef.current = buildCameraPoints(usable);
       setReady(true);
     });
 
@@ -205,50 +144,21 @@ export default function ThreeExperience() {
         return;
       }
 
-      const diff = targetIndexRef.current - progressRef.current;
-      progressRef.current += diff * (Math.abs(diff) > 1 ? 0.3 : 0.08);
+      const target = cameraPointsRef.current[targetIndexRef.current];
+      if (!target) return;
 
-      if (Math.abs(diff) < 0.001) {
-        progressRef.current = targetIndexRef.current;
-      }
+      camera.position.lerp(target.position, 0.08);
+      camera.lookAt(target.lookAt);
 
-      const i = Math.floor(progressRef.current);
-      const t = progressRef.current - i;
+      if (camera.position.distanceTo(target.position) < 0.02) {
+        if (currentIndexRef.current !== targetIndexRef.current) {
+          currentIndexRef.current = targetIndexRef.current;
 
-      const points = cameraPointsRef.current;
-      interpolateCamera(
-        camera,
-        points[i],
-        points[Math.min(i + 1, points.length - 1)],
-        t
-      );
+          const screen = screensRef.current[currentIndexRef.current - 1];
 
-      if (arrivedIndexRef.current !== targetIndexRef.current) {
-        const targetPoint = points[targetIndexRef.current];
-
-        if (
-          Math.abs(targetIndexRef.current - progressRef.current) < 0.5 &&
-          !resyncTriggeredRef.current &&
-          arrivedIndexRef.current !== 0
-        ) {
-          console.log("Starting resync");
-          startResync();
-          resyncTriggeredRef.current = true;
-        }
-
-        if (hasArrived(camera, targetPoint)) {
-          arrivedIndexRef.current = targetIndexRef.current;
-
-          const screenMesh = screensRef.current[targetIndexRef.current - 1];
-
-          if (screenMesh) {
-            powerOn(screenMesh);
-            activeScreenRef.current = screenMesh;
+          if (screen) {
+            showSection(screen.userData.section);
           }
-
-          endResync();
-          const section = indexToSectionRef.current[targetIndexRef.current];
-          if (section) showSection(section);
         }
       }
 
@@ -257,40 +167,31 @@ export default function ThreeExperience() {
 
     animate();
 
-    return () => {
-      container.removeChild(renderer.domElement);
-    };
+    return () => container.removeChild(renderer.domElement);
   }, [ready, showSection]);
 
-  /* ---------- UI ---------- */
+  /* ================= UI ================= */
+
   return (
     <>
-      <div ref={containerRef} className="w-full h-screen overflow-hidden" />
+      {/* THREE */}
+      <div className="fixed inset-0 z-0">
+        <div ref={containerRef} className="w-full h-screen" />
+      </div>
 
+      {/* NAV (ONLY INTERACTIVE AREA) */}
       {ready && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-6 z-[100]">
+        <div className="three-nav fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex gap-6">
           <button
-            onClick={() => {
-              const prevIndex =
-                targetIndexRef.current === 1
-                  ? cameraPointsRef.current.length - 1
-                  : Math.max(0, targetIndexRef.current - 1);
-              moveTo(prevIndex);
-            }}
-            className="px-4 py-2 bg-black/70 text-white rounded"
+            onClick={goPrev}
+            className="px-4 py-2 bg-black/80 text-white rounded"
           >
             ◀ Prev
           </button>
 
           <button
-            onClick={() => {
-              const nextIndex =
-                targetIndexRef.current === cameraPointsRef.current.length - 1
-                  ? 1
-                  : targetIndexRef.current + 1;
-              moveTo(nextIndex);
-            }}
-            className="px-4 py-2 bg-black/70 text-white rounded"
+            onClick={goNext}
+            className="px-4 py-2 bg-black/80 text-white rounded"
           >
             Next ▶
           </button>

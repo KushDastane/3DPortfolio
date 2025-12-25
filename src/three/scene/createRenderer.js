@@ -19,6 +19,7 @@ export function createRenderer(container) {
 
   console.log("Appending renderer domElement to container");
   container.appendChild(renderer.domElement);
+  renderer.domElement.style.zIndex = "-1";
   console.log(
     "Renderer domElement appended, children count:",
     container.children.length

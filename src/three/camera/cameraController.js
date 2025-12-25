@@ -22,8 +22,8 @@ export function interpolateCameraFromPoints(camera, points, progress) {
   const look = new THREE.Vector3().lerpVectors(from.lookAt, to.lookAt, t);
 
   // ✅ Smooth movement
-  camera.position.lerp(pos, 0.12);
-
+  camera.position.lerp(pos, 0.08);
+ 
   // 🔒 CRITICAL: remove roll forever
   camera.up.set(0, 1, 0);
   camera.lookAt(look);

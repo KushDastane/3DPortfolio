@@ -66,6 +66,7 @@ export default function ThreeExperience() {
 
   const showSection = useExperience((s) => s.showSection);
   const hideSection = useExperience((s) => s.hideSection);
+  const setNavReady = useExperience((s) => s.setNavReady);
 
   /* ================= GLOBAL LOCK ================= */
 
@@ -134,6 +135,7 @@ export default function ThreeExperience() {
       screensRef.current = usable;
       cameraPointsRef.current = buildCameraPoints(usable);
       setReady(true);
+      setNavReady(true, goNext, goPrev);
     });
 
     function animate() {
@@ -178,25 +180,6 @@ export default function ThreeExperience() {
       <div className="fixed inset-0 z-0">
         <div ref={containerRef} className="w-full h-screen" />
       </div>
-
-      {/* NAV (ONLY INTERACTIVE AREA) */}
-      {ready && (
-        <div className="three-nav fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex gap-6">
-          <button
-            onClick={goPrev}
-            className="px-4 py-2 bg-black/80 text-white rounded"
-          >
-            ◀ Prev
-          </button>
-
-          <button
-            onClick={goNext}
-            className="px-4 py-2 bg-black/80 text-white rounded"
-          >
-            Next ▶
-          </button>
-        </div>
-      )}
     </>
   );
 }

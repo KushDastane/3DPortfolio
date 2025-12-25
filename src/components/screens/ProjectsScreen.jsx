@@ -1,69 +1,92 @@
 import { useState, useEffect, useRef } from "react";
 import CRTScreen from "../CRTScreen";
 import { useExperience } from "../../store/useExperience";
+import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from "react-icons/fa";
+import {
+  SiTailwindcss,
+  SiFirebase,
+  SiMongodb,
+  SiExpress,
+  SiThreedotjs,
+  SiCloudflare,
+} from "react-icons/si";
+import { SiFlask } from "react-icons/si";
 
-/* ================= DATA ================= */
+const TECH_ICONS = {
+  react: FaReact,
+  tailwindcss: SiTailwindcss,
+  tailwind: SiTailwindcss,
+  firebase: SiFirebase,
+  cloudflare: SiCloudflare,
+  mongodb: SiMongodb,
+  node: FaNodeJs,
+  express: SiExpress,
+  javascript: FaJs,
+  html: FaHtml5,
+  css: FaCss3Alt,
+  threejs: SiThreedotjs,
+  flask: SiFlask,
+};
 
 const PROJECTS = [
   {
-    id: "eco_commerce",
-    title: "ECO_COMMERCE",
+    id: "vv_caring",
+    title: "V.V.CARING CENTER",
     status: "COMPLETED",
-    tech: ["React", "Node.js", "MongoDB"],
-    desc: "A sustainable shopping platform with real-time inventory tracking and carbon footprint calculation.",
-    live: "https://example.com",
-    git: "https://github.com/example/eco-commerce",
-    image: "https://images.unsplash.com/photo-1557821552-17105176677c?w=800",
+    tech: ["React", "TailwindCSS", "Firebase", "Cloudflare"],
+    desc: "FullStack Web Application + Admin Panel, leading to ~25% growth and efficient management. ",
+    live: "https://www.vvcaringcentre.com/",
+    git: false,
+    image: "/projects/vvc.jpeg",
   },
   {
-    id: "retro_dash",
-    title: "RETRO_DASH",
+    id: "lf",
+    title: "RETRIEVIA : LOST & FOUND",
+    status: "COMPLETED",
+    tech: ["HTML", "CSS", "JAVASCRIPT", "NODE", "EXPRESS", "MONGODB"],
+    desc: " full stack web app to replace the 10+ daily lost-item reports on University WhatsApp groups, streamlining communication into a structured system. Reunites users with lost items with AI NLP. Estimated to handle 300+ reports/month and reduce manual follow-ups by 50%.",
+    live: "https://retrievia-lost-found-system-for.onrender.com/",
+    git: "https://github.com/KushDastane/Lost-Found.git",
+    image: "/projects/lf.png",
+  },
+  {
+    id: "shoe",
+    title: "3D Shoe",
+    status: "COMPLETED",
+    tech: ["Threejs", "React", "Tailwind"],
+    desc: "Fun platform to interact with 3D model by color & material mix-match.",
+    live: "https://3dshoemodifier.netlify.app/",
+    git: "https://github.com/KushDastane/3D-Shoe-Modifier.git",
+    image: "/projects/shoe.png",
+  },
+  {
+    id: "webar",
+    title: "WebAR 3D Heart",
+    status: "COMPLETED",
+    tech: ["Javascript"],
+    desc: "Interactive WebAR Based Heart model to study its basic anatomy, built on PlayCanvas using JavaScript.",
+    live: "https://launch.playcanvas.com/2104581?debug=true",
+    git: "https://github.com/KushDastane/3D-Web-AR-Heart-Anatomy-.git",
+    image: "/projects/AR.webm",
+    marker: {
+      label: "DOWNLOAD MARKER",
+      file: "/marker/hiroMarker.jpg",
+    },
+  },
+  {
+    id: "istyle_ar",
+    title: "ISTYLE-AR",
     status: "ONGOING",
-    tech: ["React", "Tailwind", "UI Systems"],
-    desc: "A retro-futuristic dashboard inspired by classic operating systems and CRT aesthetics.",
-    live: "https://example.com",
-    git: "https://github.com/example/retro-dash",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
-  },
-  {
-    id: "portfolio_os",
-    title: "PORTFOLIO_OS",
-    status: "ACTIVE",
-    tech: ["Three.js", "React", "WebGL"],
-    desc: "An interactive 3D portfolio experience blending real-time graphics with narrative UI systems.",
-    live: "https://example.com",
-    git: "https://github.com/example/portfolio-os",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800",
-  },
-  {
-    id: "portfolio_os",
-    title: "PORTFOLIO_OS",
-    status: "ACTIVE",
-    tech: ["Three.js", "React", "WebGL"],
-    desc: "An interactive 3D portfolio experience blending real-time graphics with narrative UI systems.",
-    live: "https://example.com",
-    git: "https://github.com/example/portfolio-os",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800",
-  },
-  {
-    id: "portfolio_os",
-    title: "PORTFOLIO_OS",
-    status: "ACTIVE",
-    tech: ["Three.js", "React", "WebGL"],
-    desc: "An interactive 3D portfolio experience blending real-time graphics with narrative UI systems.",
-    live: "https://example.com",
-    git: "https://github.com/example/portfolio-os",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800",
-  },
-  {
-    id: "portfolio_os",
-    title: "PORTFOLIO_OS",
-    status: "ACTIVE",
-    tech: ["Three.js", "React", "WebGL"],
-    desc: "An interactive 3D portfolio experience blending real-time graphics with narrative UI systems.",
-    live: "https://example.com",
-    git: "https://github.com/example/portfolio-os",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800",
+    tech: ["React", "Tailwind", "Firebase", "Flask"],
+    desc: "Augmented Reality+AI based real-time virtual try-on system for clothes & accesories. Gesture Controlled experience, targeting 30–40% faster user interactions.",
+    live: false,
+    git: false,
+    image: "/projects/istylear.png",
+
+    marker: {
+      label: "PUBLISHED JOURNAL",
+      file: "https://www.ijraset.com/best-journal/istylear-virtual-tryon-using-augmented-reality",
+    },
   },
 ];
 
@@ -74,6 +97,7 @@ export default function ProjectsScreen() {
 
   const [mode, setMode] = useState("terminal"); // terminal | projects
   const [command, setCommand] = useState("");
+  const [output, setOutput] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
   const inputRef = useRef(null);
@@ -95,15 +119,20 @@ export default function ProjectsScreen() {
 
   /* ---------- COMMAND ---------- */
   function runCommand(cmd) {
-    if (cmd.toLowerCase().trim() === "list") {
+    const cleaned = cmd.toLowerCase().trim();
+
+    if (cleaned === "list") {
       setMode("projects");
+      setOutput("");
+    } else {
+      setOutput(`command not found: ${cmd}`);
     }
+
     setCommand("");
   }
 
   return (
     <CRTScreen>
-      {/* ================= TERMINAL ================= */}
       {mode === "terminal" && (
         <div
           style={{
@@ -113,7 +142,6 @@ export default function ProjectsScreen() {
             flexDirection: "column",
           }}
         >
-          {/* TOP BAR */}
           <div
             style={{
               display: "flex",
@@ -128,7 +156,6 @@ export default function ProjectsScreen() {
             <span>DIR:/PROJECTS</span>
           </div>
 
-          {/* TERMINAL BODY */}
           <div
             style={{
               flex: 1,
@@ -160,6 +187,17 @@ export default function ProjectsScreen() {
                 }}
               />
             </div>
+            {output && (
+              <pre
+                style={{
+                  marginTop: "10px",
+                  color: "#b91c1c",
+                  fontSize: "12px",
+                }}
+              >
+                {output}
+              </pre>
+            )}
 
             {/* MOBILE BUTTON */}
             {isMobile && (
@@ -200,26 +238,7 @@ export default function ProjectsScreen() {
             overflowY: "auto",
           }}
         >
-          {/* HEADER */}
-          <div
-            style={{
-              borderBottom: "2px solid rgba(0,0,0,0.7)",
-              paddingBottom: "12px",
-              marginBottom: "22px",
-            }}
-          >
-            <h1
-              style={{
-                fontSize: isMobile ? "22px" : "28px",
-                letterSpacing: "2px",
-              }}
-            >
-              PROJECTS_DIRECTORY
-            </h1>
-            <p style={{ fontSize: "12px", opacity: 0.8 }}>
-              SELECTED WORK · INTERACTIVE SYSTEMS
-            </p>
-          </div>
+          
 
           {/* GRID */}
           <div
@@ -270,36 +289,96 @@ function ProjectCard({ project }) {
         </span>
       </p>
 
-      <img
-        src={project.image}
-        alt={project.title}
-        style={{
-          width: "100%",
-          height: "180px",
-          objectFit: "cover",
-          border: "1px solid black",
-        }}
-      />
+      {project.image.endsWith(".webm") ? (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            width: "100%",
+            height: "180px",
+            objectFit: "cover",
+            border: "1px solid black",
+          }}
+        >
+          <source src={project.image} type="video/webm" />
+        </video>
+      ) : (
+        <img
+          src={project.image}
+          alt={project.title}
+          style={{
+            width: "100%",
+            height: "180px",
+            objectFit: "cover",
+            border: "1px solid black",
+          }}
+        />
+      )}
 
       <p style={{ fontSize: "13px", lineHeight: "1.6" }}>{project.desc}</p>
 
-      <div style={{ fontSize: "11px" }}>TECH: {project.tech.join(", ")}</div>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        {project.tech.map((t) => {
+          const Icon = TECH_ICONS[t.toLowerCase()];
+          return Icon ? (
+            <Icon key={t} size={18} title={t} style={{ opacity: 0.85 }} />
+          ) : null;
+        })}
+      </div>
 
       {/* ACTIONS */}
-      <div
-        style={{
-          marginTop: "auto",
-          display: "flex",
-          gap: "14px",
-          fontSize: "12px",
-        }}
-      >
-        <a href={project.live} target="_blank" rel="noreferrer">
-          [ OPEN LIVE ]
-        </a>
-        <a href={project.git} target="_blank" rel="noreferrer">
-          [ VIEW SOURCE ]
-        </a>
+      {/* ACTIONS */}
+      <div className="mt-auto flex flex-wrap gap-3 text-[12px]">
+        {/* LIVE */}
+        {project.live ? (
+          <a
+            href={project.live}
+            target="_blank"
+            rel="noreferrer"
+            className="font-bold border border-black px-2 py-[2px] hover:bg-black hover:text-[#3aeedd] transition"
+          >
+            [ OPEN LIVE ]
+          </a>
+        ) : (
+          <span className="opacity-60 border border-dashed border-black px-2 py-[2px] cursor-not-allowed">
+            [ COMING SOON ]
+          </span>
+        )}
+
+        {/* SOURCE */}
+        {project.git ? (
+          <a
+            href={project.git}
+            target="_blank"
+            rel="noreferrer"
+            className="font-bold border border-black px-2 py-[2px] hover:bg-black hover:text-[#3aeedd] transition"
+          >
+            [ VIEW SOURCE ]
+          </a>
+        ) : (
+          <span
+            className="opacity-60 border border-dashed border-black px-2 py-[2px] cursor-not-allowed"
+            title="Client / private project"
+          >
+            [ PRIVATE ]
+          </span>
+        )}
+
+        {/* MARKER (WebAR only) */}
+        {project.marker && (
+          <a
+            href={project.marker.file}
+            {...(project.marker.file.startsWith("http")
+              ? { target: "_blank", rel: "noreferrer" }
+              : { download: true })}
+            className="font-bold border border-black px-2 py-[2px] bg-black text-[#f5e96b] hover:bg-[#f5e96b] hover:text-black transition"
+            title={project.marker.label}
+          >
+            [ {project.marker.label} ]
+          </a>
+        )}
       </div>
     </div>
   );

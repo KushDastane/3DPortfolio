@@ -35,4 +35,8 @@ export const cameraPath = [
   { section: "about" },
   { section: "skills" },
   { section: "projects" },
+  { section: "experience" },
+  { section: "achievements" },
+  { section: "testimonials" },
+  { section: "contact" },
 ];

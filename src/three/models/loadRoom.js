@@ -12,19 +12,24 @@ export function loadRoom(scene) {
         const screens = [];
 
         room.traverse((node) => {
-          console.log("NODE:", node.name);
-
           if (node.name.startsWith("Screen_")) {
             let foundMesh = null;
 
             node.traverse((child) => {
-              if (!foundMesh && child.isMesh && child.geometry) {
+              if (!foundMesh && child.isMesh) {
                 foundMesh = child;
               }
             });
 
             if (foundMesh) {
+              foundMesh.material = foundMesh.material.clone();
+
+              foundMesh.material.emissive = new THREE.Color(0x000000);
+              foundMesh.material.emissiveIntensity = 0;
+
               foundMesh.userData.isScreen = true;
+              foundMesh.userData.isPoweredOn = false;
+
               if (node.name === "Screen_About")
                 foundMesh.userData.section = "about";
               else if (node.name === "Screen_Skills")
@@ -39,43 +44,27 @@ export function loadRoom(scene) {
                 foundMesh.userData.section = "testimonials";
               else if (node.name === "Screen_Contact")
                 foundMesh.userData.section = "contact";
+
               screens.push(foundMesh);
 
-              console.log(
-                "✅ SCREEN SURFACE REGISTERED:",
-                foundMesh.name,
-                "section:",
-                foundMesh.userData.section
-              );
-            } else {
-              console.warn("⚠️ No mesh found inside", node.name);
+              console.log("✅ SCREEN REGISTERED:", foundMesh.userData.section);
             }
           }
 
-          // regular mesh setup (for all meshes)
           if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
-
-            if (node.material) {
-              node.material.side = THREE.FrontSide;
-              node.material.needsUpdate = true;
-            }
+            if (node.material) node.material.side = THREE.FrontSide;
           }
         });
 
-        room.scale.set(1, 1, 1);
         room.position.set(0, -0.8, 0);
-        room.rotation.set(0, 0, 0);
-
         scene.add(room);
+
         resolve({ room, screens });
       },
       undefined,
-      (error) => {
-        console.error("❌ Failed to load room", error);
-        reject(error);
-      }
+      (err) => reject(err)
     );
   });
 }

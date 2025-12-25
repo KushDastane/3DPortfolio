@@ -18,31 +18,36 @@ const screens = {
 };
 
 export default function PortfolioUI() {
-  const { activeSection, previousSection, transitioning } = useExperience();
+  const { activeSection } = useExperience();
 
   return (
-    <div className="fixed inset-0 z-40 pointer-events-none">
+    // UI layer sits above 3D, below nav buttons
+    <div
+      className={`fixed inset-0 z-40 ${
+        activeSection ? "" : "pointer-events-none"
+      }`}
+    >
       {Object.entries(screens).map(([key, Screen]) => {
         const isActive = activeSection === key;
-        const isLeaving = previousSection === key && transitioning;
 
-        return (
+        return (  
           <div
             key={key}
             className={`
               absolute inset-0 flex items-center justify-center
-              transition-opacity duration-700 ease-out
-              ${
-                isActive && !transitioning
-                  ? "opacity-100 pointer-events-auto"
-                  : ""
-              }
-              ${isLeaving ? "opacity-0 pointer-events-none" : ""}
-              ${!isActive && !isLeaving ? "opacity-0 pointer-events-none" : ""}
+              transition-opacity duration-500 ease-out
+              ${isActive ? "opacity-100" : "opacity-0"}
             `}
           >
-            {/* UI CONTENT ONLY */}
-            <div className="pointer-events-auto">
+            {/* 
+              Only the actual UI content should receive pointer events.
+              Background stays transparent and non-blocking.
+            */}
+            <div
+              className={`${
+                isActive ? "pointer-events-auto" : "pointer-events-none"
+              }`}
+            >
               <Screen />
             </div>
           </div>

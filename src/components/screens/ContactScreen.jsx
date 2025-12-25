@@ -18,7 +18,7 @@ export default function ContactScreen() {
           from_email: e.target.email.value,
           message: e.target.message.value,
         },
-        "WcWpLPpjw7D73b7dt"
+        "xFLspg7cIcxfDEKsJ"
       )
       .then(
         () => {

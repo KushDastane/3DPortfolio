@@ -4,6 +4,8 @@ import { useExperience } from "../../store/useExperience";
 
 export function loadRoom(scene) {
   return new Promise((resolve, reject) => {
+
+    const MIN_VISIBLE = 300;
     const loader = new GLTFLoader();
 
     const experience = useExperience.getState();
@@ -39,75 +41,80 @@ export function loadRoom(scene) {
 
       /* ================= ON LOAD ================= */
       (gltf) => {
-        clearInterval(interval);
+  clearInterval(interval);
 
-        // Smooth finish
-        experience.setLoadingProgress(100);
+  const elapsed = performance.now() - startTime;
+  const remaining = Math.max(MIN_VISIBLE - elapsed, 0);
 
-        const room = gltf.scene;
-        const screens = [];
+  setTimeout(() => {
+    // Final snap
+    experience.setLoadingProgress(100);
 
-        room.traverse((node) => {
-          /* ---------- SCREENS ---------- */
-          if (node.name.startsWith("Screen_")) {
-            let foundMesh = null;
+    const room = gltf.scene;
+    const screens = [];
 
-            node.traverse((child) => {
-              if (!foundMesh && child.isMesh) foundMesh = child;
-            });
+    room.traverse((node) => {
+      /* ---------- SCREENS ---------- */
+      if (node.name.startsWith("Screen_")) {
+        let foundMesh = null;
 
-            if (foundMesh) {
-              foundMesh.material = foundMesh.material.clone();
-              foundMesh.material.emissive = new THREE.Color(0x000000);
-              foundMesh.material.emissiveIntensity = 0;
-
-              foundMesh.userData.isScreen = true;
-              foundMesh.userData.isPoweredOn = false;
-
-              const sectionMap = {
-                Screen_About: "about",
-                Screen_Skills: "skills",
-                Screen_Projects: "projects",
-                Screen_Experience: "experience",
-                Screen_Achievements: "achievements",
-                Screen_Testimonials: "testimonials",
-                Screen_Contact: "contact",
-              };
-
-              foundMesh.userData.section = sectionMap[node.name];
-              screens.push(foundMesh);
-
-              console.log("✅ SCREEN REGISTERED:", foundMesh.userData.section);
-            }
-          }
-
-          /* ---------- MATERIAL FIX ---------- */
-          if (node.isMesh && node.material) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-
-            node.material.side = THREE.FrontSide;
-
-            if (node.material.color) {
-              node.material.color.convertSRGBToLinear();
-            }
-
-            node.material.roughness = 0.9;
-            node.material.metalness = 0.05;
-          }
+        node.traverse((child) => {
+          if (!foundMesh && child.isMesh) foundMesh = child;
         });
 
-        room.position.set(0, -0.8, 0);
+        if (foundMesh) {
+          foundMesh.material = foundMesh.material.clone();
+          foundMesh.material.emissive = new THREE.Color(0x000000);
+          foundMesh.material.emissiveIntensity = 0;
 
-        // Mobile scale
-        if (window.innerWidth < 768) {
-          room.scale.setScalar(0.35);
+          foundMesh.userData.isScreen = true;
+          foundMesh.userData.isPoweredOn = false;
+
+          const sectionMap = {
+            Screen_About: "about",
+            Screen_Skills: "skills",
+            Screen_Projects: "projects",
+            Screen_Experience: "experience",
+            Screen_Achievements: "achievements",
+            Screen_Testimonials: "testimonials",
+            Screen_Contact: "contact",
+          };
+
+          foundMesh.userData.section = sectionMap[node.name];
+          screens.push(foundMesh);
+
+          console.log("✅ SCREEN REGISTERED:", foundMesh.userData.section);
+        }
+      }
+
+      /* ---------- MATERIAL FIX ---------- */
+      if (node.isMesh && node.material) {
+        node.castShadow = true;
+        node.receiveShadow = true;
+
+        node.material.side = THREE.FrontSide;
+
+        if (node.material.color) {
+          node.material.color.convertSRGBToLinear();
         }
 
-        scene.add(room);
+        node.material.roughness = 0.9;
+        node.material.metalness = 0.05;
+      }
+    });
 
-        resolve({ room, screens });
-      },
+    room.position.set(0, -0.8, 0);
+
+    // Mobile scale
+    if (window.innerWidth < 768) {
+      room.scale.setScalar(0.35);
+    }
+
+    scene.add(room);
+    resolve({ room, screens });
+  }, remaining);
+}
+
 
       /* ================= ON PROGRESS ================= */
       () => {

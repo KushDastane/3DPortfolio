@@ -11,10 +11,28 @@ export function loadRoom(scene) {
     /* ================= FAKE PROGRESS (SMOOTH) ================= */
 
     let progressValue = 0;
+    let startTime = performance.now();
+
     const interval = setInterval(() => {
-      progressValue = Math.min(progressValue + 1.5, 90);
-      experience.setLoadingProgress(Math.floor(progressValue));
-    }, 100);
+      const elapsed = performance.now() - startTime;
+
+      // Fast internet → jump quickly
+      if (elapsed < 300) {
+        progressValue += 15;
+      }
+      // Medium phase
+      else if (elapsed < 800) {
+        progressValue += 6;
+      }
+      // Slow polish near end
+      else {
+        progressValue += 2;
+      }
+
+      progressValue = Math.min(progressValue, 90);
+      useExperience.getState().setLoadingProgress(Math.floor(progressValue));
+    }, 80);
+
 
     loader.load(
       "/models/room/room2.glb",
@@ -101,6 +119,7 @@ export function loadRoom(scene) {
       /* ================= ON ERROR ================= */
       (err) => {
         clearInterval(interval);
+        useExperience.getState().setLoadingProgress(100);
         reject(err);
       }
     );

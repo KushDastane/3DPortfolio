@@ -9,6 +9,8 @@ export const useExperience = create((set) => ({
   goPrev: null,
   canGoPrev: false,
   isTransitioning: false,
+  fullyLoaded: false,
+  loadingProgress: 0,
 
   showSection: (section) =>
     set((state) => ({
@@ -23,4 +25,6 @@ export const useExperience = create((set) => ({
   setCanGoPrev: (can) => set({ canGoPrev: can }),
   setIsTransitioning: (transitioning) =>
     set({ isTransitioning: transitioning }),
+  setFullyLoaded: (loaded) => set({ fullyLoaded: loaded }),
+  setLoadingProgress: (progress) => set({ loadingProgress: progress }),
 }));

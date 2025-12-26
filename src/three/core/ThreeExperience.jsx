@@ -63,6 +63,7 @@ export default function ThreeExperience() {
   const targetIndexRef = useRef(0);
 
   const [ready, setReady] = useState(false);
+  const [bgLoaded, setBgLoaded] = useState(false);
 
   const showSection = useExperience((s) => s.showSection);
   const hideSection = useExperience((s) => s.hideSection);
@@ -71,6 +72,7 @@ export default function ThreeExperience() {
   const setIsTransitioning = useExperience((s) => s.setIsTransitioning);
   const isTransitioning = useExperience((s) => s.isTransitioning);
   const canGoPrev = useExperience((s) => s.canGoPrev);
+  const setFullyLoaded = useExperience((s) => s.setFullyLoaded);
 
   /* ================= GLOBAL LOCK ================= */
 
@@ -78,6 +80,22 @@ export default function ThreeExperience() {
     if (ready) document.body.classList.add("three-active");
     return () => document.body.classList.remove("three-active");
   }, [ready]);
+
+  /* ================= BACKGROUND IMAGE LOADING ================= */
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/images/bg1.webp";
+    img.onload = () => setBgLoaded(true);
+  }, []);
+
+  /* ================= FULLY LOADED ================= */
+
+  useEffect(() => {
+    if (ready && bgLoaded) {
+      setFullyLoaded(true);
+    }
+  }, [ready, bgLoaded, setFullyLoaded]);
 
   /* ================= NAV ================= */
 

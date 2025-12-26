@@ -1,5 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
+import { useExperience } from "../../store/useExperience";
 
 export function loadRoom(scene) {
   return new Promise((resolve, reject) => {
@@ -8,6 +9,8 @@ export function loadRoom(scene) {
     loader.load(
       "/models/room/room2.glb",
       (gltf) => {
+        // Set progress to 100% when loaded
+        useExperience.getState().setLoadingProgress(100);
         const room = gltf.scene;
         const screens = [];
 
@@ -69,7 +72,6 @@ export function loadRoom(scene) {
               node.material.metalness = 0.05;
             }
           }
-
         });
 
         room.position.set(0, -0.8, 0);
@@ -77,7 +79,11 @@ export function loadRoom(scene) {
 
         resolve({ room, screens });
       },
-      undefined,
+      (progress) => {
+        // Update progress during loading
+        const percent = (progress.loaded / progress.total) * 100;
+        useExperience.getState().setLoadingProgress(percent);
+      },
       (err) => reject(err)
     );
   });

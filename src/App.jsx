@@ -1,14 +1,18 @@
 import ThreeExperience from "./three/core/ThreeExperience";
 import PortfolioUI from "./components/PortfolioUI";
+import LoadingScreen from "./components/LoadingScreen";
 import { useExperience } from "./store/useExperience";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 function App() {
-  const { navReady, goNext, goPrev, canGoPrev, isTransitioning } =
+  const { navReady, goNext, goPrev, canGoPrev, isTransitioning, fullyLoaded } =
     useExperience();
 
   return (
     <>
+      {/* Loading Screen - shows until fully loaded */}
+      {!fullyLoaded && <LoadingScreen />}
+
       <div className="fixed inset-0">
         <ThreeExperience />
       </div>

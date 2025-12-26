@@ -75,6 +75,12 @@ export function loadRoom(scene) {
         });
 
         room.position.set(0, -0.8, 0);
+
+        // Scale down on mobile devices
+        if (window.innerWidth < 768) {
+          room.scale.set(0.35, 0.35, 0.35);
+        }
+
         scene.add(room);
 
         resolve({ room, screens });

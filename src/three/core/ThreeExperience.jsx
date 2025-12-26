@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-
+import { addCurvedTitle } from "../objects/CurvedTitle";
 import { useExperience } from "../../store/useExperience";
 import { createScene } from "../scene/createScene";
 import { createCamera } from "../scene/createCamera";
@@ -55,6 +55,7 @@ function buildCameraPoints(screens) {
 
 export default function ThreeExperience() {
   const containerRef = useRef(null);
+  const sceneRef = useRef(null);
 
   const cameraPointsRef = useRef([]);
   const screensRef = useRef([]);
@@ -73,6 +74,7 @@ export default function ThreeExperience() {
   const isTransitioning = useExperience((s) => s.isTransitioning);
   const canGoPrev = useExperience((s) => s.canGoPrev);
   const setFullyLoaded = useExperience((s) => s.setFullyLoaded);
+  const fullyLoaded = useExperience((s) => s.fullyLoaded);
 
   /* ================= GLOBAL LOCK ================= */
 
@@ -96,6 +98,14 @@ export default function ThreeExperience() {
       setFullyLoaded(true);
     }
   }, [ready, bgLoaded, setFullyLoaded]);
+
+  /* ================= ADD CURVED TITLE ================= */
+
+  useEffect(() => {
+    if (fullyLoaded && sceneRef.current && window.innerWidth < 768) {
+      addCurvedTitle(sceneRef.current);
+    }
+  }, [fullyLoaded]);
 
   /* ================= NAV ================= */
 
@@ -141,6 +151,7 @@ export default function ThreeExperience() {
     const container = containerRef.current;
 
     const scene = createScene();
+    sceneRef.current = scene;
     const camera = createCamera(container.clientWidth, container.clientHeight);
     const renderer = createRenderer(container);
 

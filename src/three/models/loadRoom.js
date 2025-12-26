@@ -87,8 +87,15 @@ export function loadRoom(scene) {
       },
       (progress) => {
         // Update progress during loading
-        const percent = (progress.loaded / progress.total) * 100;
-        useExperience.getState().setLoadingProgress(percent);
+        if (!progress.total || progress.total === 0) {
+          useExperience.getState().setLoadingProgress(0);
+        } else {
+          const percent = Math.min(
+            (progress.loaded / progress.total) * 100,
+            99
+          );
+          useExperience.getState().setLoadingProgress(percent);
+        }
       },
       (err) => reject(err)
     );

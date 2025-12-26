@@ -6,9 +6,16 @@ export function loadRoom(scene) {
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
 
+    let fakeProgress = 0;
+    const interval = setInterval(() => {
+      fakeProgress = Math.min(fakeProgress + 2, 90);
+      useExperience.getState().setLoadingProgress(fakeProgress);
+    }, 100);
+
     loader.load(
       "/models/room/room2.glb",
       (gltf) => {
+        clearInterval(interval);
         // Set progress to 100% when loaded
         useExperience.getState().setLoadingProgress(100);
         const room = gltf.scene;

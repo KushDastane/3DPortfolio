@@ -2,80 +2,111 @@ import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 
+/**
+ * Adds a curved, stable, non-flickering 3D title
+ * Mobile + desktop safe
+ */
 export function addCurvedTitle(scene) {
   const loader = new FontLoader();
 
   loader.load("/fonts/Inter_Bold.json", (font) => {
-    /* ================= GROUP ================= */
-
     const group = new THREE.Group();
 
-    /* ================= BASE CONFIG ================= */
+    /* ================= TEXT CONFIG ================= */
 
-    const baseConfig = {
+    const config = {
       font,
       size: 0.65,
-      height: 0.06,
-      curveSegments: 24,
-      bevelEnabled: false,
+      height: 0.12,
+      curveSegments: 32,
+      bevelEnabled: true,
+      bevelThickness: 0.02,
+      bevelSize: 0.015,
+      bevelSegments: 5,
     };
 
-    /* ================= CURVE FUNCTION ================= */
+    /* ================= STABLE CURVE ================= */
 
-    function curveGeometry(geo, radius = 9, strength = 0.9) {
+    function curveText(geo, radius = 14, strength = 0.45) {
       const pos = geo.attributes.position;
+      geo.computeBoundingBox();
+
+      const centerX = (geo.boundingBox.max.x + geo.boundingBox.min.x) / 2;
 
       for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const z = Math.sin(x / radius) * strength;
-        pos.setZ(i, z);
+        const x = pos.getX(i) - centerX;
+        pos.setZ(i, Math.sin(x / radius) * strength);
       }
 
       pos.needsUpdate = true;
       geo.computeVertexNormals();
     }
 
-    /* ================= KUSH ================= */
+    /* ================= GEOMETRIES ================= */
 
-    const kushGeo = new TextGeometry("KUSH", baseConfig);
+    const kushGeo = new TextGeometry("KUSH", config);
     kushGeo.center();
-    curveGeometry(kushGeo, 9, 0.9);
+    curveText(kushGeo);
 
-    /* ================= DASTANE ================= */
-
-    const dastaneGeo = new TextGeometry("DASTANE", baseConfig);
+    const dastaneGeo = new TextGeometry("DASTANE", config);
     dastaneGeo.center();
-    curveGeometry(dastaneGeo, 9, 0.9);
+    curveText(dastaneGeo);
 
-    /* ================= MATERIAL ================= */
+    /* ================= MATERIALS ================= */
 
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xe3e7ea,
-      transparent: true,
-      opacity: 0.45,
-      roughness: 0.85,
-      metalness: 0.0,
-      emissive: new THREE.Color(0x000000),
-      emissiveIntensity: 0,
-      side: THREE.DoubleSide,
+    const textMaterial = new THREE.MeshStandardMaterial({
+      color: 0xdedbff,
+      roughness: 0.45,
+      metalness: 0.2,
+      emissive: 0x000000,
+      dithering: true,
     });
 
-    /* ================= MESHES ================= */
+    const outlineMaterial = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      side: THREE.BackSide,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
+    });
 
-    const kushMesh = new THREE.Mesh(kushGeo, material);
-    const dastaneMesh = new THREE.Mesh(dastaneGeo, material);
+    /* ================= MESH BUILDER ================= */
 
-    kushMesh.position.set(0, 0.45, 0);
-    dastaneMesh.position.set(0, -0.35, 0);
+    function addText(geo, y) {
+      const main = new THREE.Mesh(geo, textMaterial);
+      const outline = new THREE.Mesh(geo.clone(), outlineMaterial);
 
-    group.add(kushMesh);
-    group.add(dastaneMesh);
+      // minimal scale to avoid depth precision loss
+      outline.scale.setScalar(1.02);
 
-    /* ================= FINAL PLACEMENT ================= */
+      main.position.y = y;
+      outline.position.y = y;
 
-    group.position.set(0, 2.85, -2.3);
-    group.rotation.x = -0.08;
+      // deterministic draw order
+      outline.renderOrder = 1;
+      main.renderOrder = 2;
+
+      group.add(outline, main);
+    }
+
+    addText(kushGeo, 0.95);
+    addText(dastaneGeo, -0.01);
+
+    /* ================= PLACEMENT ================= */
+
+    /* ================= PLACEMENT ================= */
+
+    group.position.set(0, 2.4, -1.4);
+    group.rotation.x = -0.06;
+    group.scale.setScalar(1.25); // 🔥 INCREASE SIZE HERE
     group.frustumCulled = false;
+
+    // Mobile correction
+    if (window.innerWidth < 768) {
+      group.scale.setScalar(0.9); // still bigger than before
+      group.position.y -= 0.1;
+    }
 
     scene.add(group);
   });

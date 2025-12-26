@@ -37,7 +37,7 @@ const PROJECTS = [
     desc: "FullStack Web Application + Admin Panel, leading to ~25% growth and efficient management. ",
     live: "https://www.vvcaringcentre.com/",
     git: false,
-    image: "/projects/vvc.jpeg",
+    image: "/images/vvc.webp",
   },
   {
     id: "lf",
@@ -47,7 +47,7 @@ const PROJECTS = [
     desc: " full stack web app to replace the 10+ daily lost-item reports on University WhatsApp groups, streamlining communication into a structured system. Reunites users with lost items with AI NLP. Estimated to handle 300+ reports/month and reduce manual follow-ups by 50%.",
     live: "https://retrievia-lost-found-system-for.onrender.com/",
     git: "https://github.com/KushDastane/Lost-Found.git",
-    image: "/projects/lf.png",
+    image: "/images/lf.webp",
   },
   {
     id: "shoe",
@@ -57,7 +57,7 @@ const PROJECTS = [
     desc: "Fun platform to interact with 3D model by color & material mix-match.",
     live: "https://3dshoemodifier.netlify.app/",
     git: "https://github.com/KushDastane/3D-Shoe-Modifier.git",
-    image: "/projects/shoe.png",
+    image: "/images/shoe.webp",
   },
   {
     id: "webar",
@@ -70,7 +70,7 @@ const PROJECTS = [
     image: "/projects/AR.webm",
     marker: {
       label: "DOWNLOAD MARKER",
-      file: "/marker/hiroMarker.jpg",
+      file: "images/hiroMarker.webp",
     },
   },
   {
@@ -81,7 +81,7 @@ const PROJECTS = [
     desc: "Augmented Reality+AI based real-time virtual try-on system for clothes & accesories. Gesture Controlled experience, targeting 30–40% faster user interactions.",
     live: false,
     git: false,
-    image: "/projects/istylear.png",
+    image: "/images/istylear.webp",
 
     marker: {
       label: "PUBLISHED JOURNAL",

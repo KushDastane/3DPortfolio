@@ -184,7 +184,7 @@ export default function ThreeExperience() {
       <div
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: "url('/bg1.jpg')",
+          backgroundImage: "url('/images/bg1.webp')",
 
           // "url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80)",
           backgroundSize: "cover",

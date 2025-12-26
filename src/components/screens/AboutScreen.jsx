@@ -20,7 +20,7 @@ export default function AboutScreen() {
                 <div className="flex flex-col items-center sm:items-start gap-2">
                   <div className="w-[110px] h-[110px] border-2 border-black/70 bg-black/60 relative overflow-hidden">
                     <img
-                      src="/pfp.webp"
+                      src="/images/pfp.webp"
                       alt="Profile"
                       className="
         w-full h-full object-cover  scale-130
@@ -29,6 +29,7 @@ export default function AboutScreen() {
         brightness-90
         mix-blend-screen
       "
+      loading="lazy"
                     />
 
                     <div className="absolute inset-0 border border-black/30 m-1 pointer-events-none"></div>
@@ -58,15 +59,15 @@ export default function AboutScreen() {
                   <div className="grid grid-cols-3 gap-2 text-xs">
                     <div className="border border-black/30 p-2">
                       <span className="opacity-70 font-mono block mb-0.5">
-                        STATUS
+                        EDUCATION
                       </span>
-                      <span className="font-bold font-mono">ACTIVE</span>
+                      <span className="font-bold font-mono">MIT ADT UNIVERSITY, PUNE</span>
                     </div>
                     <div className="border border-black/30 p-2">
                       <span className="opacity-70 font-mono block mb-0.5">
                         LOCATION
                       </span>
-                      <span className="font-bold font-mono">INDIA</span>
+                      <span className="font-bold font-mono">MUMBAI</span>
                     </div>
                   </div>
 

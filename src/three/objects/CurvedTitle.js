@@ -10,7 +10,7 @@ export function addCurvedTitle(scene) {
 
     const group = new THREE.Group();
 
-    /* ================= GEOMETRY SETTINGS ================= */
+    /* ================= BASE CONFIG ================= */
 
     const baseConfig = {
       font,
@@ -20,20 +20,9 @@ export function addCurvedTitle(scene) {
       bevelEnabled: false,
     };
 
-    /* ================= TEXT: KUSH ================= */
-
-    const kushGeo = new TextGeometry("KUSH", baseConfig);
-    kushGeo.center();
-
-    /* ================= TEXT: DASTANE ================= */
-
-    const dastaneGeo = new TextGeometry("DASTANE", baseConfig);
-    dastaneGeo.center();
-
     /* ================= CURVE FUNCTION ================= */
 
-    function curveGeometry(geo, strength = 1) {
-      const radius = 9;
+    function curveGeometry(geo, radius = 9, strength = 0.9) {
       const pos = geo.attributes.position;
 
       for (let i = 0; i < pos.count; i++) {
@@ -46,24 +35,30 @@ export function addCurvedTitle(scene) {
       geo.computeVertexNormals();
     }
 
-    curveGeometry(kushGeo, 0.9);
-    curveGeometry(dastaneGeo, 0.9);
+    /* ================= KUSH ================= */
+
+    const kushGeo = new TextGeometry("KUSH", baseConfig);
+    kushGeo.center();
+    curveGeometry(kushGeo, 9, 0.9);
+
+    /* ================= DASTANE ================= */
+
+    const dastaneGeo = new TextGeometry("DASTANE", baseConfig);
+    dastaneGeo.center();
+    curveGeometry(dastaneGeo, 9, 0.9);
 
     /* ================= MATERIAL ================= */
 
-   const material = new THREE.MeshStandardMaterial({
-     color: 0xe3e7ea, // light grey, clearly darker than bg
-     transparent: true,
-     opacity: 0.45, // stronger presence without blocking light
-
-     roughness: 0.85, // smooth but not shiny
-     metalness: 0.0, // stays neutral on light BG
-
-     emissive: new THREE.Color(0x000000),
-     emissiveIntensity: 0,
-
-     side: THREE.DoubleSide,
-   });
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xe3e7ea,
+      transparent: true,
+      opacity: 0.45,
+      roughness: 0.85,
+      metalness: 0.0,
+      emissive: new THREE.Color(0x000000),
+      emissiveIntensity: 0,
+      side: THREE.DoubleSide,
+    });
 
     /* ================= MESHES ================= */
 
@@ -76,11 +71,10 @@ export function addCurvedTitle(scene) {
     group.add(kushMesh);
     group.add(dastaneMesh);
 
-    /* ================= GROUP PLACEMENT ================= */
+    /* ================= FINAL PLACEMENT ================= */
 
-    group.position.set(0, 2.85, -2.3); // back wall
-    group.rotation.x = -0.08; // slight wall tilt
-    group.renderOrder = -1;
+    group.position.set(0, 2.85, -2.3);
+    group.rotation.x = -0.08;
     group.frustumCulled = false;
 
     scene.add(group);

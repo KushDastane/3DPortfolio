@@ -92,6 +92,8 @@ export function loadRoom(scene) {
 
           if (window.innerWidth < 768) {
             room.scale.setScalar(0.35);
+          } else {
+            room.scale.setScalar(0.9);
           }
 
           scene.add(room);

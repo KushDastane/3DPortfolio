@@ -56,7 +56,7 @@ export default function AboutScreen() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="border border-black/30 p-2">
                       <span className="opacity-70 font-mono block mb-0.5">
                         EDUCATION

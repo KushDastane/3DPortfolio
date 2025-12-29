@@ -28,7 +28,7 @@ export function loadRoom(scene) {
     }, 80);
 
     loader.load(
-      "/models/room/room2.glb",
+      "/models/room/room3.glb",
 
       (gltf) => {
         clearInterval(interval);

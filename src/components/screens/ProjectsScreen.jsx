@@ -44,7 +44,7 @@ const PROJECTS = [
     title: "RETRIEVIA : LOST & FOUND",
     status: "COMPLETED",
     tech: ["HTML", "CSS", "JAVASCRIPT", "NODE", "EXPRESS", "MONGODB"],
-    desc: " full stack web app to replace the 10+ daily lost-item reports on University WhatsApp groups, streamlining communication into a structured system. Reunites users with lost items with AI NLP. Estimated to handle 300+ reports/month and reduce manual follow-ups by 50%.",
+    desc: "Full stack web app to replace the 10+ daily lost-item reports on University WhatsApp groups, streamlining communication into a structured system. Reunites users with lost items with AI NLP. Estimated to handle 300+ reports/month and reduce manual follow-ups by 50%.",
     live: "https://retrievia-lost-found-system-for.onrender.com/",
     git: "https://github.com/KushDastane/Lost-Found.git",
     image: "/images/lf.webp",
@@ -238,8 +238,6 @@ export default function ProjectsScreen() {
             overflowY: "auto",
           }}
         >
-          
-
           {/* GRID */}
           <div
             style={{

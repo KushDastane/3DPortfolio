@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import CRTScreen from "../CRTScreen";
 import { useExperience } from "../../store/useExperience";
+import { audioManager } from "../../utils/AudioManager";
 import { FaReact, FaNodeJs, FaHtml5, FaCss3Alt, FaJs } from "react-icons/fa";
 import {
   SiTailwindcss,
@@ -173,7 +174,10 @@ export default function ProjectsScreen() {
               <input
                 ref={inputRef}
                 value={command}
-                onChange={(e) => setCommand(e.target.value)}
+                onChange={(e) => {
+                  setCommand(e.target.value);
+                  audioManager.playClick();
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") runCommand(command);
                 }}
@@ -277,11 +281,10 @@ function ProjectCard({ project }) {
         STATUS:{" "}
         <span
           className={`px-2 py-[2px] rounded font-bold tracking-wider
-      ${
-        project.status === "COMPLETED"
-          ? "bg-black text-[#3aeedd] shadow-[0_0_6px_rgba(58,238,221,0.6)]"
-          : "bg-black text-[#f5e96b] shadow-[0_0_6px_rgba(245,233,107,0.6)]"
-      }`}
+      ${project.status === "COMPLETED"
+              ? "bg-black text-[#3aeedd] shadow-[0_0_6px_rgba(58,238,221,0.6)]"
+              : "bg-black text-[#f5e96b] shadow-[0_0_6px_rgba(245,233,107,0.6)]"
+            }`}
         >
           {project.status}
         </span>

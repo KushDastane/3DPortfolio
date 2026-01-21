@@ -1,0 +1,6 @@
+- [ ] Create `src/components/AudioControls.jsx` with music and SFX toggle buttons styled to theme.
+- [ ] Extend `src/utils/AudioManager.js` to include `musicEnabled`, `sfxEnabled`, methods `toggleMusic`, `toggleSFX`, and respect `sfxEnabled` in click/whoosh calls.
+- [ ] Update `src/App.jsx` to conditionally play click sounds based on `sfxEnabled` and to auto‑enable music on next navigation if not explicitly disabled.
+- [ ] Import and render `<AudioControls />` in the app layout (e.g., inside the main container).
+- [ ] Add CSS to hide the audio controls on CRT screens (e.g., `.crt-ui .audio-controls { display: none; }`).
+- [ ] Verify: manual UI test toggling buttons, ensure music starts on next click, ensure SFX respects toggle, ensure controls not visible on CRT view.

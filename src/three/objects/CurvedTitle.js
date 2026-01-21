@@ -9,14 +9,14 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 export function addCurvedTitle(scene) {
   const loader = new FontLoader();
 
-  loader.load("/fonts/Inter_Bold.json", (font) => {
+  loader.load("/fonts/BBH.json", (font) => {
     const group = new THREE.Group();
 
     /* ================= TEXT CONFIG ================= */
 
     const config = {
       font,
-      size: 0.65,
+      size: 0.5,
       height: 0.12,
       curveSegments: 32,
       bevelEnabled: true,
@@ -55,10 +55,11 @@ export function addCurvedTitle(scene) {
     /* ================= MATERIALS ================= */
 
     const textMaterial = new THREE.MeshStandardMaterial({
-      color: 0xdedbff,
-      roughness: 0.45,
-      metalness: 0.2,
-      emissive: 0x000000,
+      color: 0x2dd4bf, // Teal color
+      roughness: 0.3,
+      metalness: 0.6,
+      emissive: 0x14b8a6, // Teal emissive glow
+      emissiveIntensity: 0.4,
       dithering: true,
     });
 
@@ -95,16 +96,14 @@ export function addCurvedTitle(scene) {
 
     /* ================= PLACEMENT ================= */
 
-    /* ================= PLACEMENT ================= */
-
     group.position.set(0, 2.4, -1.4);
     group.rotation.x = -0.06;
-    group.scale.setScalar(1.25); // 🔥 INCREASE SIZE HERE
+    group.scale.setScalar(0.85); // Further reduced to prevent clipping
     group.frustumCulled = false;
 
     // Mobile correction
     if (window.innerWidth < 768) {
-      group.scale.setScalar(0.9); // still bigger than before
+      group.scale.setScalar(0.65); // Adjusted for mobile
       group.position.y -= 0.1;
     }
 

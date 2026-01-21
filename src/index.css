@@ -186,6 +186,12 @@ body.three-active .portfolio-ui {
   pointer-events: auto;
 }
 
+/* ✅ Allow audio controls */
+body.three-active .audio-controls-wrapper,
+body.three-active .audio-controls-wrapper * {
+  pointer-events: auto;
+}
+
 body.three-active .active-screen,
 body.three-active .active-screen * {
   pointer-events: auto;

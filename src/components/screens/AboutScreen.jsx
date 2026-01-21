@@ -29,7 +29,7 @@ export default function AboutScreen() {
         brightness-90
         mix-blend-screen
       "
-      loading="lazy"
+                      loading="lazy"
                     />
 
                     <div className="absolute inset-0 border border-black/30 m-1 pointer-events-none"></div>

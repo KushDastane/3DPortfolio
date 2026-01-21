@@ -7,6 +7,13 @@ import { createCamera } from "../scene/createCamera";
 import { createRenderer } from "../scene/createRenderer";
 import { createLights } from "../scene/createLights";
 import { loadRoom } from "../models/loadRoom";
+import { createParticles } from "../objects/Particles";
+import { audioManager } from "../../utils/AudioManager";
+
+// Postprocessing
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 
 /* ================= CONFIG ================= */
 
@@ -56,6 +63,8 @@ function buildCameraPoints(screens) {
 export default function ThreeExperience() {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
+  const composerRef = useRef(null);
+  const particlesRef = useRef(null);
 
   const cameraPointsRef = useRef([]);
   const screensRef = useRef([]);
@@ -115,6 +124,7 @@ export default function ThreeExperience() {
     targetIndexRef.current = index;
     setCanGoPrev(index > 0);
     setIsTransitioning(true);
+    audioManager.playWhoosh();
   }
 
   function goNext() {
@@ -126,7 +136,7 @@ export default function ThreeExperience() {
     if (!isTransitioning)
       goTo(
         (targetIndexRef.current - 1 + cameraPointsRef.current.length) %
-          cameraPointsRef.current.length
+        cameraPointsRef.current.length
       );
   }
 
@@ -155,6 +165,25 @@ export default function ThreeExperience() {
     const camera = createCamera(container.clientWidth, container.clientHeight);
     const renderer = createRenderer(container);
 
+    // Particles
+    const particles = createParticles();
+    particlesRef.current = particles;
+    scene.add(particles.points);
+
+    // Composer & Bloom
+    const composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(container.clientWidth, container.clientHeight),
+      1.5, // strength
+      0.4, // radius
+      0.85 // threshold
+    );
+    composer.addPass(bloomPass);
+    composerRef.current = composer;
+
     createLights(scene);
 
     loadRoom(scene).then(({ screens }) => {
@@ -172,11 +201,15 @@ export default function ThreeExperience() {
       setNavReady(true, goNext, goPrev);
     });
 
-    function animate() {
+    function animate(time) {
       requestAnimationFrame(animate);
 
+      if (particlesRef.current) {
+        particlesRef.current.animate(time);
+      }
+
       if (!ready) {
-        renderer.render(scene, camera);
+        composer.render();
         return;
       }
 
@@ -197,12 +230,16 @@ export default function ThreeExperience() {
         }
       }
 
-      renderer.render(scene, camera);
+      composer.render();
     }
 
-    animate();
+    animate(0);
 
-    return () => container.removeChild(renderer.domElement);
+    return () => {
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
+    };
   }, [ready, showSection]);
 
   /* ================= UI ================= */
@@ -214,13 +251,11 @@ export default function ThreeExperience() {
         className="fixed inset-0 z-0"
         style={{
           backgroundImage: "url('/images/bg1.webp')",
-
-          // "url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "blur(40px) brightness(1.05) contrast(0.9)",
           transform: "scale(1.1)",
-          opacity: 0.35, // 🔥 MUCH MORE VISIBLE
+          opacity: 0.35,
         }}
       />
 

@@ -32,18 +32,9 @@ export default function SkillsScreen() {
             <h1 className="text-xl sm:text-2xl font-bold tracking-widest">
               SKILLS.sys
             </h1>
-            <span className="text-xs opacity-70 font-mono">[DIAGNOSTICS]</span>
+
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs opacity-90">
-            <span className="font-mono">USER: KUSH</span>
-            <span>•</span>
-            <span className="font-mono">
-              SESSION: {new Date().getFullYear()}
-            </span>
-            <span>•</span>
-            <span className="font-mono">STATUS: OPERATIONAL</span>
-          </div>
         </div>
 
         {/* ================= MAIN GRID ================= */}

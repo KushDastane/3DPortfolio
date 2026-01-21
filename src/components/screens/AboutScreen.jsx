@@ -11,7 +11,7 @@ export default function AboutScreen() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono">▶ PROFILE_DATA</span>
                 </div>
-                <span className="text-xs opacity-60 font-mono">ID: KD-042</span>
+
               </div>
             </div>
 

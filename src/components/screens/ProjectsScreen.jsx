@@ -12,6 +12,7 @@ import {
   SiCloudflare,
 } from "react-icons/si";
 import { SiFlask } from "react-icons/si";
+import { DiPython } from "react-icons/di";
 
 const TECH_ICONS = {
   react: FaReact,
@@ -27,6 +28,7 @@ const TECH_ICONS = {
   css: FaCss3Alt,
   threejs: SiThreedotjs,
   flask: SiFlask,
+  python: DiPython,
 };
 
 const PROJECTS = [
@@ -39,6 +41,16 @@ const PROJECTS = [
     live: "https://www.vvcaringcentre.com/",
     git: false,
     image: "/images/vvc.webp",
+  },
+  {
+    id: "particle_space",
+    title: "PARTICLE SPACE 3D",
+    status: "COMPLETED",
+    tech: ["Threejs", "Python", "Javascript", "React", "Tailwind"],
+    desc: "Gesture Controlled Futuristic 3D model viewer with AI based particle animation. Also designed for user uploaded 3D models.",
+    live: "https://particlespace.netlify.app/",
+    git: "https://github.com/KushDastane/ParticleSpace.git",
+    image: "/images/thumbnail.webp",
   },
   {
     id: "lf",
@@ -240,20 +252,14 @@ export default function ProjectsScreen() {
             padding: isMobile ? "18px" : "28px",
             height: "100%",
             overflowY: "auto",
+            scrollbarWidth: "none",
           }}
+          className="no-scrollbar"
         >
           {/* GRID */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: isMobile
-                ? "1fr"
-                : "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: isMobile ? "18px" : "22px",
-            }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
             {PROJECTS.map((p) => (
-              <ProjectCard key={p.id} project={p} />
+              <ProjectCard key={p.id} project={p} isMobile={isMobile} />
             ))}
           </div>
         </div>
@@ -264,122 +270,140 @@ export default function ProjectsScreen() {
 
 /* ================= CARD ================= */
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, isMobile }) {
+  // Mobile: Always colored (grayscale-0), full opacity.
+  // Desktop: Grayscale + 80% opacity -> Full color + 100% opacity on hover.
+  const imageClasses = isMobile
+    ? "w-full h-full object-cover opacity-100 grayscale-0"
+    : "w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 grayscale group-hover:grayscale-0";
+
   return (
     <div
-      style={{
-        border: "2px solid rgba(0,0,0,0.7)",
-        padding: "16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-      }}
+      className="group flex flex-col h-full bg-black border border-teal-500/30 transition-all duration-300 relative rounded-none"
     >
-      <h2 style={{ fontSize: "18px" }}>{project.title}</h2>
+      {/* HUD CORNERS - Static now */}
+      <div className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t-2 border-l-2 border-teal-500/50 transition-colors" />
+      <div className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t-2 border-r-2 border-teal-500/50 transition-colors" />
+      <div className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b-2 border-l-2 border-teal-500/50 transition-colors" />
+      <div className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b-2 border-r-2 border-teal-500/50 transition-colors" />
 
-      <p className="text-[11px]">
-        STATUS:{" "}
-        <span
-          className={`px-2 py-[2px] rounded font-bold tracking-wider
-      ${project.status === "COMPLETED"
-              ? "bg-black text-[#3aeedd] shadow-[0_0_6px_rgba(58,238,221,0.6)]"
-              : "bg-black text-[#f5e96b] shadow-[0_0_6px_rgba(245,233,107,0.6)]"
-            }`}
-        >
-          {project.status}
-        </span>
-      </p>
+      {/* MEDIA CONTAINER - 16:9 Aspect Ratio */}
+      <div className="w-full aspect-video overflow-hidden border-b border-teal-500/20 relative z-0 transition-colors">
+        {/* SCANLINE OVERLAY */}
+        <div className="absolute inset-0 pointer-events-none z-[2] bg-[length:100%_4px] bg-[linear-gradient(rgba(0,0,0,0)50%,rgba(0,0,0,0.5)50%)] opacity-30" />
 
-      {project.image.endsWith(".webm") ? (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          style={{
-            width: "100%",
-            height: "180px",
-            objectFit: "cover",
-            border: "1px solid black",
-          }}
-        >
-          <source src={project.image} type="video/webm" />
-        </video>
-      ) : (
-        <img
-          src={project.image}
-          alt={project.title}
-          style={{
-            width: "100%",
-            height: "180px",
-            objectFit: "cover",
-            border: "1px solid black",
-          }}
-        />
-      )}
+        {project.image.endsWith(".webm") ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={imageClasses}
+          >
+            <source src={project.image} type="video/webm" />
+          </video>
+        ) : (
+          <img
+            src={project.image}
+            alt={project.title}
+            className={imageClasses}
+          />
+        )}
 
-      <p style={{ fontSize: "13px", lineHeight: "1.6" }}>{project.desc}</p>
-
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-        {project.tech.map((t) => {
-          const Icon = TECH_ICONS[t.toLowerCase()];
-          return Icon ? (
-            <Icon key={t} size={18} title={t} style={{ opacity: 0.85 }} />
-          ) : null;
-        })}
+        {/* Status Badge */}
+        <div className="absolute top-0 right-0 bg-black/90 border-b border-l border-teal-500/30 px-2 py-1 z-[10]">
+          <span
+            className={`text-[10px] font-mono tracking-widest
+              ${project.status === "COMPLETED"
+                ? "text-teal-400"
+                : "text-amber-400" // Use amber for ongoing/alert
+              }`}
+          >
+            [STATUS: {project.status}]
+          </span>
+        </div>
       </div>
 
-      {/* ACTIONS */}
-      {/* ACTIONS */}
-      <div className="mt-auto flex flex-wrap gap-3 text-[12px]">
-        {/* LIVE */}
-        {project.live ? (
-          <a
-            href={project.live}
-            target="_blank"
-            rel="noreferrer"
-            className="font-bold border border-black px-2 py-[2px] hover:bg-black hover:text-[#3aeedd] transition"
-          >
-            [ OPEN LIVE ]
-          </a>
-        ) : (
-          <span className="opacity-60 border border-dashed border-black px-2 py-[2px] cursor-not-allowed">
-            [ COMING SOON ]
-          </span>
-        )}
+      {/* CONTENT */}
+      <div className="flex-1 flex flex-col p-4 gap-3 relative z-10 font-mono">
 
-        {/* SOURCE */}
-        {project.git ? (
-          <a
-            href={project.git}
-            target="_blank"
-            rel="noreferrer"
-            className="font-bold border border-black px-2 py-[2px] hover:bg-black hover:text-[#3aeedd] transition"
-          >
-            [ VIEW SOURCE ]
-          </a>
-        ) : (
-          <span
-            className="opacity-60 border border-dashed border-black px-2 py-[2px] cursor-not-allowed"
-            title="Client / private project"
-          >
-            [ PRIVATE ]
-          </span>
-        )}
+        <div className="flex items-center gap-2 border-b border-teal-500/10 pb-2 mb-1">
+          <span className="text-teal-500/50 text-xs">&gt;</span>
+          <h2 className="text-sm font-bold tracking-widest text-teal-100 transition-colors">
+            {project.title.toUpperCase()}
+          </h2>
+        </div>
 
-        {/* MARKER (WebAR only) */}
-        {project.marker && (
-          <a
-            href={project.marker.file}
-            {...(project.marker.file.startsWith("http")
-              ? { target: "_blank", rel: "noreferrer" }
-              : { download: true })}
-            className="font-bold border border-black px-2 py-[2px] bg-black text-[#f5e96b] hover:bg-[#f5e96b] hover:text-black transition"
-            title={project.marker.label}
-          >
-            [ {project.marker.label} ]
-          </a>
-        )}
+        {/* Improved Contrast: text-teal-400/90 instead of 500/70 */}
+        <p className="text-xs text-teal-400/90 leading-relaxed min-h-[3.5em]">
+          {project.desc}
+        </p>
+
+        {/* TECH STACK */}
+        <div className="border-t border-teal-500/10 pt-2">
+          <div className="text-[10px] text-teal-600 mb-1">LIB_DEPENDENCIES:</div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {project.tech.map((t) => {
+              const Icon = TECH_ICONS[t.toLowerCase()];
+              return Icon ? (
+                <div key={t} className="flex items-center gap-1 text-teal-400/80 transition-colors" title={t}>
+                  <Icon size={12} />
+                  <span className="text-[10px] uppercase">{t}</span>
+                </div>
+              ) : null;
+            })}
+          </div>
+        </div>
+
+        {/* ACTIONS */}
+        <div className="mt-auto pt-4 flex flex-wrap gap-2 text-[10px] font-bold tracking-wider">
+          {/* LIVE */}
+          {project.live ? (
+            <a
+              href={project.live}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1 text-center py-2 border border-teal-500/30 text-teal-400 hover:bg-teal-500 hover:text-black transition-all uppercase"
+            >
+              [ OPEN_UPLINK ]
+            </a>
+          ) : (
+            <span className="flex-1 text-center py-2 border border-white/5 text-white/20 cursor-not-allowed uppercase border-dashed">
+              [ OFFLINE ]
+            </span>
+          )}
+
+          {/* SOURCE */}
+          {project.git ? (
+            <a
+              href={project.git}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1 text-center py-2 border border-teal-500/30 text-teal-400 hover:bg-teal-500 hover:text-black transition-all uppercase"
+            >
+              [ SOURCE_DATA ]
+            </a>
+          ) : (
+            <span
+              className="flex-1 text-center py-2 border border-white/5 text-white/20 cursor-not-allowed uppercase border-dashed"
+            >
+              [ ENCRYPTED ]
+            </span>
+          )}
+
+          {/* MARKER */}
+          {project.marker && (
+            <a
+              href={project.marker.file}
+              {...(project.marker.file.startsWith("http")
+                ? { target: "_blank", rel: "noreferrer" }
+                : { download: true })}
+              className="w-full text-center py-2 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-black transition-all uppercase"
+            >
+              [ GET_MARKER_FILE ]
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

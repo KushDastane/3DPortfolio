@@ -246,22 +246,10 @@ export default function ThreeExperience() {
 
   return (
     <>
-      {/* BLURRED BACKGROUND IMAGE */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: "url('/images/bg1.webp')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "blur(40px) brightness(1.05) contrast(0.9)",
-          transform: "scale(1.1)",
-          opacity: 0.35,
-        }}
-      />
 
       {/* THREE */}
       <div className="fixed inset-0 z-10">
-        <div ref={containerRef} className="w-full h-screen" />
+        <div ref={containerRef} className="w-full h-screen bg-black" />
       </div>
     </>
   );
